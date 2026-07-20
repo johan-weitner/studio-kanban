@@ -1,0 +1,33 @@
+.cell {
+  min-height: 60px;
+  padding: var(--space-2);
+  border-right: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  transition: background 0.15s ease;
+}
+
+.cell.over {
+  background: var(--accent-subtle);
+}
+
+.addBtn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  width: 100%;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.cell:hover .addBtn {
+  opacity: 1;
+}
+
+.addBtn:hover {
+  background: var(--bg-card);
+}

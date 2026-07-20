@@ -1,0 +1,27 @@
+services:
+  backend:
+    build: ./backend
+    volumes:
+      - ./backend/src:/app/src   # tsx watch picks up changes here
+      - db-data:/app/data        # SQLite persistence
+    ports:
+      - "3001:3001"
+    environment:
+      - DATABASE_URL=/app/data/studio-kanban.db
+      - NODE_ENV=development
+
+  frontend:
+    build: ./frontend
+    volumes:
+      - ./frontend/src:/app/src          # Vite watches src/
+      - ./frontend/index.html:/app/index.html
+      - ./frontend/public:/app/public
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_TARGET=http://backend:3001
+    depends_on:
+      - backend
+
+volumes:
+  db-data:

@@ -1,0 +1,64 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.row:hover {
+  background: var(--bg-card);
+}
+
+.songTitle {
+  flex: 1;
+  text-align: left;
+  padding: var(--space-1) 0;
+  border-radius: var(--radius-sm);
+}
+
+.songTitle:hover {
+  color: var(--accent);
+}
+
+.deleteBtn {
+  color: var(--text-muted);
+  font-size: var(--text-md);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.row:hover .deleteBtn {
+  opacity: 1;
+}
+
+.deleteBtn:hover {
+  background: var(--bg-card-hover);
+  color: var(--color-discarded);
+}
+
+.empty {
+  padding: var(--space-3);
+  text-align: center;
+}
+
+.addRow {
+  display: flex;
+  gap: var(--space-2);
+}
