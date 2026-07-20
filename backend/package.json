@@ -1,0 +1,28 @@
+{
+  "name": "studio-kanban-backend",
+  "version": "1.0.0",
+  "description": "Studio Kanban backend API",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "gen:openapi": "tsx src/scripts/gen-openapi.ts"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "cors": "^2.8.5",
+    "drizzle-orm": "^0.38.0",
+    "better-sqlite3": "^11.0.0",
+    "zod": "^3.23.0",
+    "@asteasolutions/zod-to-openapi": "^7.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0",
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "@types/better-sqlite3": "^7.6.11",
+    "drizzle-kit": "^0.29.0"
+  }
+}

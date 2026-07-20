@@ -1,0 +1,22 @@
+.textarea {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  padding: var(--space-2) var(--space-3);
+  min-height: 80px;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s ease;
+  line-height: 1.5;
+}
+
+.textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.textarea:focus {
+  border-color: var(--border-focus);
+}

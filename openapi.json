@@ -1,0 +1,1670 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Studio Kanban API",
+    "description": "REST API for the Studio Kanban music production board",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3001",
+      "description": "Local development"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "Project": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "name": {
+            "type": "string",
+            "example": "My Album"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "A great debut album"
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2024-01-01 12:00:00"
+          },
+          "updatedAt": {
+            "type": "string",
+            "example": "2024-01-01 12:00:00"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "Column": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440001"
+          },
+          "projectId": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "name": {
+            "type": "string",
+            "example": "In Progress"
+          },
+          "color": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "#3B82F6"
+          },
+          "order": {
+            "type": "integer",
+            "example": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2024-01-01 12:00:00"
+          }
+        },
+        "required": [
+          "id",
+          "projectId",
+          "name",
+          "color",
+          "order",
+          "createdAt"
+        ]
+      },
+      "Song": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440002"
+          },
+          "projectId": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "title": {
+            "type": "string",
+            "example": "Track 1"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "Upbeat intro track"
+          },
+          "order": {
+            "type": "integer",
+            "example": 0
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2024-01-01 12:00:00"
+          },
+          "updatedAt": {
+            "type": "string",
+            "example": "2024-01-01 12:00:00"
+          }
+        },
+        "required": [
+          "id",
+          "projectId",
+          "title",
+          "description",
+          "order",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "Subtask": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440004"
+          },
+          "taskId": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440003"
+          },
+          "title": {
+            "type": "string",
+            "example": "Set up microphones"
+          },
+          "completed": {
+            "type": "boolean",
+            "example": false
+          },
+          "order": {
+            "type": "integer",
+            "example": 0
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2024-01-01 12:00:00"
+          }
+        },
+        "required": [
+          "id",
+          "taskId",
+          "title",
+          "completed",
+          "order",
+          "createdAt"
+        ]
+      },
+      "Task": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440003"
+          },
+          "songId": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440002"
+          },
+          "columnId": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440001"
+          },
+          "title": {
+            "type": "string",
+            "example": "Record drums"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "Record kick and snare tracks"
+          },
+          "assignee": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "Alice"
+          },
+          "order": {
+            "type": "integer",
+            "example": 0
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2024-01-01 12:00:00"
+          },
+          "updatedAt": {
+            "type": "string",
+            "example": "2024-01-01 12:00:00"
+          },
+          "subtasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Subtask"
+            },
+            "description": "Subtasks for this task"
+          }
+        },
+        "required": [
+          "id",
+          "songId",
+          "columnId",
+          "title",
+          "description",
+          "assignee",
+          "order",
+          "createdAt",
+          "updatedAt",
+          "subtasks"
+        ]
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/api/projects": {
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "List all projects",
+        "responses": {
+          "200": {
+            "description": "List of projects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Project"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Create a project",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "example": "My Album"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "An optional description"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created project",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{id}": {
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Get a project by ID",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440000"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Project",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Update a project",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440000"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "example": "Updated Name"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Updated description"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated project",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Delete a project",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440000"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{projectId}/columns": {
+      "get": {
+        "tags": [
+          "Columns"
+        ],
+        "summary": "List columns for a project",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440000"
+            },
+            "required": true,
+            "name": "projectId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of columns",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Column"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Columns"
+        ],
+        "summary": "Create a column",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440000"
+            },
+            "required": true,
+            "name": "projectId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "example": "Mixing"
+                  },
+                  "color": {
+                    "type": "string",
+                    "example": "#8B5CF6"
+                  },
+                  "order": {
+                    "type": "integer",
+                    "example": 4
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created column",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Column"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/columns/{id}": {
+      "put": {
+        "tags": [
+          "Columns"
+        ],
+        "summary": "Update a column",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440001"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "example": "Updated Column"
+                  },
+                  "color": {
+                    "type": "string",
+                    "example": "#EC4899"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated column",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Column"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Columns"
+        ],
+        "summary": "Delete a column",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440001"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/columns/{id}/order": {
+      "patch": {
+        "tags": [
+          "Columns"
+        ],
+        "summary": "Update column order",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440001"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "order": {
+                    "type": "integer",
+                    "example": 2
+                  }
+                },
+                "required": [
+                  "order"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated column",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Column"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{projectId}/songs": {
+      "get": {
+        "tags": [
+          "Songs"
+        ],
+        "summary": "List songs for a project",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440000"
+            },
+            "required": true,
+            "name": "projectId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of songs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Song"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Songs"
+        ],
+        "summary": "Create a song",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440000"
+            },
+            "required": true,
+            "name": "projectId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "example": "Track 1"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "An optional description"
+                  }
+                },
+                "required": [
+                  "title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created song",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Song"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/songs/{id}": {
+      "put": {
+        "tags": [
+          "Songs"
+        ],
+        "summary": "Update a song",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440002"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "example": "Updated Title"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Updated description"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated song",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Song"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Songs"
+        ],
+        "summary": "Delete a song",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440002"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/songs/{id}/order": {
+      "patch": {
+        "tags": [
+          "Songs"
+        ],
+        "summary": "Update song order",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440002"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "order": {
+                    "type": "integer",
+                    "example": 2
+                  }
+                },
+                "required": [
+                  "order"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated song",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Song"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tasks/{taskId}/subtasks": {
+      "get": {
+        "tags": [
+          "Subtasks"
+        ],
+        "summary": "List subtasks for a task",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440003"
+            },
+            "required": true,
+            "name": "taskId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of subtasks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Subtask"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Subtasks"
+        ],
+        "summary": "Create a subtask",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440003"
+            },
+            "required": true,
+            "name": "taskId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "example": "Set up microphones"
+                  },
+                  "order": {
+                    "type": "integer",
+                    "example": 0
+                  }
+                },
+                "required": [
+                  "title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created subtask",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Subtask"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/subtasks/{id}": {
+      "put": {
+        "tags": [
+          "Subtasks"
+        ],
+        "summary": "Update a subtask",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440004"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "example": "Updated title"
+                  },
+                  "completed": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated subtask",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Subtask"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Subtasks"
+        ],
+        "summary": "Delete a subtask",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440004"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/songs/{songId}/tasks": {
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "List tasks for a song (with subtasks)",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440002"
+            },
+            "required": true,
+            "name": "songId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of tasks with subtasks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Task"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Create a task for a song",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440002"
+            },
+            "required": true,
+            "name": "songId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "columnId": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440001"
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "example": "Record drums"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Record kick and snare"
+                  },
+                  "assignee": {
+                    "type": "string",
+                    "example": "Alice"
+                  }
+                },
+                "required": [
+                  "columnId",
+                  "title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created task",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tasks/{id}": {
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Get a task by ID (with subtasks)",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440003"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task with subtasks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Update a task",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440003"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "example": "Updated Title"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Updated description"
+                  },
+                  "assignee": {
+                    "type": "string",
+                    "example": "Bob"
+                  },
+                  "columnId": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440001"
+                  },
+                  "order": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated task",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Delete a task",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440003"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tasks/{id}/move": {
+      "patch": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Move a task to a different column or song",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "550e8400-e29b-41d4-a716-446655440003"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "columnId": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440001"
+                  },
+                  "songId": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440002"
+                  },
+                  "order": {
+                    "type": "integer",
+                    "example": 0
+                  }
+                },
+                "required": [
+                  "columnId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Moved task",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Column/project mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "webhooks": {}
+}
