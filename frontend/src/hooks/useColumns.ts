@@ -13,10 +13,7 @@ export function useColumns(projectId: string) {
 export function useCreateColumn() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({
-      projectId,
-      ...data
-    }: { projectId: string; name: string; color?: string }) =>
+    mutationFn: ({ projectId, ...data }: { projectId: string; name: string; color?: string }) =>
       apiFetch<Column>(`/projects/${projectId}/columns`, {
         method: 'POST',
         body: JSON.stringify(data),

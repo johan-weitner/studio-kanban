@@ -1,19 +1,21 @@
-FROM node:20-alpine AS frontend-builder
+FROM node:20-bookworm-slim AS frontend-builder
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm ci
 COPY frontend/ ./
 RUN npm run build
 
-FROM node:20-alpine AS backend-builder
-RUN apk add --no-cache python3 make g++
+FROM node:20-bookworm-slim AS backend-builder
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends python3 make g++ \
+  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app/backend
 COPY backend/package*.json ./
 RUN npm ci
 COPY backend/ ./
 RUN npm run build && npm prune --omit=dev
 
-FROM node:20-alpine AS runner
+FROM node:20-bookworm-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=8080
