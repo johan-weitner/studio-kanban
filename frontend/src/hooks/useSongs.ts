@@ -46,7 +46,7 @@ export function useUpdateSong() {
 export function useDeleteSong() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, projectId }: { id: string; projectId: string }) =>
+    mutationFn: ({ id }: { id: string; projectId: string }) =>
       apiFetch<void>(`/songs/${id}`, { method: 'DELETE' }),
     onSuccess: (_data, variables) =>
       qc.invalidateQueries({ queryKey: ['songs', variables.projectId] }),

@@ -96,7 +96,7 @@ export function useMoveTask() {
 export function useDeleteTask() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, songId }: { id: string; songId: string }) =>
+    mutationFn: ({ id }: { id: string; songId: string }) =>
       apiFetch<void>(`/tasks/${id}`, { method: 'DELETE' }),
     onSuccess: (_data, variables) => {
       qc.invalidateQueries({ queryKey: ['tasks', variables.songId] })

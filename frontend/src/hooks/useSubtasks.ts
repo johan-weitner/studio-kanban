@@ -47,7 +47,7 @@ export function useUpdateSubtask() {
 export function useDeleteSubtask() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, taskId }: { id: string; taskId: string }) =>
+    mutationFn: ({ id }: { id: string; taskId: string }) =>
       apiFetch<void>(`/subtasks/${id}`, { method: 'DELETE' }),
     onSuccess: (_data, variables) => {
       qc.invalidateQueries({ queryKey: ['subtasks', variables.taskId] })
