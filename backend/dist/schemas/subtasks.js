@@ -1,0 +1,66 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UpdateSubtaskSchema = exports.CreateSubtaskSchema = exports.SubtaskSchema = void 0;
+const registry_1 = require("./registry");
+exports.SubtaskSchema = registry_1.registry.register('Subtask', registry_1.z.object({
+    id: registry_1.z.string().openapi({ example: '550e8400-e29b-41d4-a716-446655440004' }),
+    taskId: registry_1.z.string().openapi({ example: '550e8400-e29b-41d4-a716-446655440003' }),
+    title: registry_1.z.string().openapi({ example: 'Set up microphones' }),
+    completed: registry_1.z.boolean().openapi({ example: false }),
+    order: registry_1.z.number().int().openapi({ example: 0 }),
+    createdAt: registry_1.z.string().openapi({ example: '2024-01-01 12:00:00' }),
+}));
+exports.CreateSubtaskSchema = registry_1.z.object({
+    title: registry_1.z.string().min(1).openapi({ example: 'Set up microphones' }),
+    order: registry_1.z.number().int().optional().openapi({ example: 0 }),
+});
+exports.UpdateSubtaskSchema = registry_1.z.object({
+    title: registry_1.z.string().min(1).optional().openapi({ example: 'Updated title' }),
+    completed: registry_1.z.boolean().optional().openapi({ example: true }),
+});
+const taskIdParam = registry_1.z.object({ taskId: registry_1.z.string().openapi({ example: '550e8400-e29b-41d4-a716-446655440003' }) });
+const idParam = registry_1.z.object({ id: registry_1.z.string().openapi({ example: '550e8400-e29b-41d4-a716-446655440004' }) });
+const errSchema = registry_1.z.object({ error: registry_1.z.string() });
+registry_1.registry.registerPath({
+    method: 'get',
+    path: '/api/tasks/{taskId}/subtasks',
+    tags: ['Subtasks'],
+    summary: 'List subtasks for a task',
+    request: { params: taskIdParam },
+    responses: {
+        200: { description: 'List of subtasks', content: { 'application/json': { schema: registry_1.z.array(exports.SubtaskSchema) } } },
+    },
+});
+registry_1.registry.registerPath({
+    method: 'post',
+    path: '/api/tasks/{taskId}/subtasks',
+    tags: ['Subtasks'],
+    summary: 'Create a subtask',
+    request: { params: taskIdParam, body: { content: { 'application/json': { schema: exports.CreateSubtaskSchema } } } },
+    responses: {
+        201: { description: 'Created subtask', content: { 'application/json': { schema: exports.SubtaskSchema } } },
+        400: { description: 'Validation error', content: { 'application/json': { schema: errSchema } } },
+    },
+});
+registry_1.registry.registerPath({
+    method: 'put',
+    path: '/api/subtasks/{id}',
+    tags: ['Subtasks'],
+    summary: 'Update a subtask',
+    request: { params: idParam, body: { content: { 'application/json': { schema: exports.UpdateSubtaskSchema } } } },
+    responses: {
+        200: { description: 'Updated subtask', content: { 'application/json': { schema: exports.SubtaskSchema } } },
+        404: { description: 'Not found', content: { 'application/json': { schema: errSchema } } },
+    },
+});
+registry_1.registry.registerPath({
+    method: 'delete',
+    path: '/api/subtasks/{id}',
+    tags: ['Subtasks'],
+    summary: 'Delete a subtask',
+    request: { params: idParam },
+    responses: {
+        204: { description: 'Deleted' },
+        404: { description: 'Not found', content: { 'application/json': { schema: errSchema } } },
+    },
+});
