@@ -1,6 +1,8 @@
 # Studio Kanban
 
 A Kanban board for music production. Organize projects, songs, and tasks with configurable columns.
+Intended for personal local use, hence no authentication or user management. But it can of course be hosted in the cloud as well.
+**Demo**: [Go here](https://studio-kanban-verdant-harborlight-7283.fly.dev/).
 
 ## Quick Start
 
@@ -34,6 +36,9 @@ To regenerate frontend TypeScript types after backend changes:
 ```bash
 cd frontend && npm run generate:api
 ```
+
+## Screenshot
+![Studio Kanban Screenshot](./assets/studio-kanban-screenshot.png)
 
 ## Stack
 
