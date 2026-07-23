@@ -41,6 +41,23 @@ export const tasks = sqliteTable('tasks', {
   updatedAt: text('updated_at').notNull().default(sql`(CURRENT_TIMESTAMP)`),
 });
 
+export const projectMembers = sqliteTable('project_members', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  projectId: text('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull(),
+  role: text('role').notNull().default('member'),
+  createdAt: text('created_at').notNull().default(sql`(CURRENT_TIMESTAMP)`),
+});
+
+export const projectInvites = sqliteTable('project_invites', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  projectId: text('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
+  token: text('token').notNull().unique(),
+  createdBy: text('created_by').notNull(),
+  expiresAt: text('expires_at').notNull(),
+  createdAt: text('created_at').notNull().default(sql`(CURRENT_TIMESTAMP)`),
+});
+
 export const subtasks = sqliteTable('subtasks', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   taskId: text('task_id').notNull().references(() => tasks.id, { onDelete: 'cascade' }),

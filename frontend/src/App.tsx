@@ -1,5 +1,8 @@
+import { useEffect } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import styles from './App.module.css'
 import { authClient } from './auth'
+import { apiFetch } from './api/client'
 import { Board } from './components/board/Board/Board'
 import { BoardHeader } from './components/board/BoardHeader/BoardHeader'
 import { ColumnManager } from './components/column/ColumnManager/ColumnManager'
@@ -15,6 +18,24 @@ import { useUIStore } from './stores/useUIStore'
 export default function App() {
   const { data: session, isPending } = authClient.useSession()
   const activeProjectId = useUIStore((s) => s.activeProjectId)
+  const setActiveProjectId = useUIStore((s) => s.setActiveProjectId)
+  const qc = useQueryClient()
+
+  // Handle ?join=<token> invite links after the session is established
+  useEffect(() => {
+    if (!session) return
+    const params = new URLSearchParams(window.location.search)
+    const token = params.get('join')
+    if (!token) return
+    // Remove the param from the URL without a reload
+    window.history.replaceState({}, '', window.location.pathname)
+    apiFetch<{ projectId: string }>(`/join/${token}`, { method: 'POST' })
+      .then(({ projectId }) => {
+        qc.invalidateQueries({ queryKey: ['projects'] })
+        setActiveProjectId(projectId)
+      })
+      .catch(() => alert('This invite link is invalid or has expired.'))
+  }, [session])
 
   if (isPending) {
     return (

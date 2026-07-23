@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { eq } from 'drizzle-orm';
+import { eq, or, inArray } from 'drizzle-orm';
 import { db } from '../db/index';
-import { projects, columns, songs } from '../db/schema';
+import { projects, columns, songs, projectMembers } from '../db/schema';
 import { CreateProjectSchema, UpdateProjectSchema } from '../schemas/projects';
 import { CreateColumnSchema } from '../schemas/columns';
 import { CreateSongSchema } from '../schemas/songs';
@@ -15,10 +15,23 @@ const DEFAULT_COLUMNS = [
   { name: 'Discarded',   color: '#EF4444', order: 3 },
 ];
 
-// GET /api/projects
+// GET /api/projects — owned projects + projects where user is a member
 projectsRouter.get('/', async (req, res) => {
   try {
-    const result = await db.select().from(projects).where(eq(projects.ownerId, req.user.id));
+    const memberships = await db
+      .select({ projectId: projectMembers.projectId })
+      .from(projectMembers)
+      .where(eq(projectMembers.userId, req.user.id));
+    const memberProjectIds = memberships.map((m) => m.projectId);
+
+    const result = await db
+      .select()
+      .from(projects)
+      .where(
+        memberProjectIds.length > 0
+          ? or(eq(projects.ownerId, req.user.id), inArray(projects.id, memberProjectIds))
+          : eq(projects.ownerId, req.user.id)
+      );
     res.json(result);
   } catch (err: unknown) {
     console.error(err);

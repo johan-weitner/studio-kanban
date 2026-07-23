@@ -5,6 +5,10 @@ export const auth = betterAuth({
   database: sqlite,
   secret: process.env.BETTER_AUTH_SECRET!,
   baseURL: process.env.BETTER_AUTH_URL ?? 'http://localhost:5173',
+  emailAndPassword: {
+    enabled: true,
+    minPasswordLength: 8,
+  },
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID!,

@@ -1,8 +1,17 @@
+import { useState } from 'react'
 import { authClient } from '../../../auth'
 import { Term } from '../../ui/Term/Term'
 import styles from './LoginPage.module.css'
 
 export function LoginPage() {
+  const [mode, setMode] = useState<'google' | 'email'>('google')
+  const [isSignUp, setIsSignUp] = useState(false)
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
   const handleGoogleSignIn = () => {
     authClient.signIn.social({
       provider: 'google',
@@ -10,22 +19,82 @@ export function LoginPage() {
     })
   }
 
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    try {
+      if (isSignUp) {
+        const result = await authClient.signUp.email({ name, email, password, callbackURL: window.location.origin })
+        if (result.error) setError(result.error.message ?? 'Sign up failed')
+      } else {
+        const result = await authClient.signIn.email({ email, password, callbackURL: window.location.origin })
+        if (result.error) setError(result.error.message ?? 'Sign in failed')
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        <img
-          src="/studio-kanban.png"
-          alt="Studio Kanban"
-          className={styles.logo}
-        />
-        <Term variant="muted" className={styles.tagline}>
-          Track your production workflow
-        </Term>
+        <img src="/studio-kanban.png" alt="Studio Kanban" className={styles.logo} />
+        <Term variant="muted" className={styles.tagline}>Track your production workflow</Term>
 
-        <button className={styles.googleBtn} onClick={handleGoogleSignIn}>
-          <GoogleIcon />
-          <Term className={styles.googleBtnText}>Sign in with Google</Term>
-        </button>
+        {mode === 'google' ? (
+          <>
+            <button className={styles.googleBtn} onClick={handleGoogleSignIn}>
+              <GoogleIcon />
+              <Term className={styles.googleBtnText}>Sign in with Google</Term>
+            </button>
+            <button className={styles.switchLink} onClick={() => setMode('email')}>
+              <Term variant="muted">Use email instead</Term>
+            </button>
+          </>
+        ) : (
+          <form className={styles.emailForm} onSubmit={handleEmailSubmit}>
+            {isSignUp && (
+              <input
+                className={styles.emailInput}
+                type="text"
+                placeholder="Your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            )}
+            <input
+              className={styles.emailInput}
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <input
+              className={styles.emailInput}
+              type="password"
+              placeholder="Password (min 8 chars)"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={8}
+            />
+            {error && <Term className={styles.errorMsg}>{error}</Term>}
+            <button className={styles.submitBtn} type="submit" disabled={loading}>
+              <Term>{loading ? '…' : isSignUp ? 'Create account' : 'Sign in'}</Term>
+            </button>
+            <div className={styles.formFooter}>
+              <button type="button" className={styles.switchLink} onClick={() => setIsSignUp((v) => !v)}>
+                <Term variant="muted">{isSignUp ? 'Already have an account? Sign in' : 'No account? Sign up'}</Term>
+              </button>
+              <button type="button" className={styles.switchLink} onClick={() => setMode('google')}>
+                <Term variant="muted">Use Google instead</Term>
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   )

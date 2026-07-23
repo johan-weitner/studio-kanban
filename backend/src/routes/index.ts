@@ -7,6 +7,7 @@ import { subtasksRouter } from './subtasks';
 import { requireAuth } from '../middleware/requireAuth';
 import { exportRouter } from './export';
 import { importRouter } from './import';
+import { invitesRouter } from './invites';
 
 export const router = Router();
 
@@ -20,3 +21,4 @@ router.use('/tasks', tasksRouter);
 router.use('/subtasks', subtasksRouter);
 router.use('/export', exportRouter);
 router.use('/import', importRouter);
+router.use('/', invitesRouter);
