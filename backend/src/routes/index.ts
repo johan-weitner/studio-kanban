@@ -5,6 +5,8 @@ import { songsRouter } from './songs';
 import { tasksRouter } from './tasks';
 import { subtasksRouter } from './subtasks';
 import { requireAuth } from '../middleware/requireAuth';
+import { exportRouter } from './export';
+import { importRouter } from './import';
 
 export const router = Router();
 
@@ -16,3 +18,5 @@ router.use('/columns', columnsRouter);
 router.use('/songs', songsRouter);
 router.use('/tasks', tasksRouter);
 router.use('/subtasks', subtasksRouter);
+router.use('/export', exportRouter);
+router.use('/import', importRouter);
