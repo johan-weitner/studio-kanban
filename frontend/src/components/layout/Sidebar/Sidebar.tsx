@@ -1,8 +1,11 @@
+import { useRef } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import styles from './Sidebar.module.css'
 import { Term } from '../../ui/Term/Term'
 import { Button } from '../../ui/Button/Button'
 import { useProjects } from '../../../hooks/useProjects'
 import { useUIStore } from '../../../stores/useUIStore'
+import { apiFetch } from '../../../api/client'
 
 export function Sidebar() {
   const { data: projects, isLoading } = useProjects()
@@ -10,6 +13,29 @@ export function Sidebar() {
   const setActiveProjectId = useUIStore((s) => s.setActiveProjectId)
   const openCreateProject = useUIStore((s) => s.openCreateProject)
   const openEditProject = useUIStore((s) => s.openEditProject)
+  const importRef = useRef<HTMLInputElement>(null)
+  const qc = useQueryClient()
+
+  const handleExport = async () => {
+    const data = await apiFetch<object>('/export')
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `studio-kanban-backup-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const text = await file.text()
+    const json = JSON.parse(text)
+    await apiFetch('/import', { method: 'POST', body: JSON.stringify(json) })
+    qc.invalidateQueries({ queryKey: ['projects'] })
+    e.target.value = ''
+  }
 
   return (
     <div className={styles.sidebar}>
@@ -61,6 +87,21 @@ export function Sidebar() {
         <Button variant="ghost" size="sm" onClick={openCreateProject} className={styles.newBtn}>
           <Term>+ New Project</Term>
         </Button>
+        <div className={styles.dataActions}>
+          <Button variant="ghost" size="sm" onClick={handleExport} className={styles.dataBtn}>
+            <Term>Export</Term>
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => importRef.current?.click()} className={styles.dataBtn}>
+            <Term>Import</Term>
+          </Button>
+          <input
+            ref={importRef}
+            type="file"
+            accept=".json"
+            className={styles.hiddenInput}
+            onChange={handleImportFile}
+          />
+        </div>
       </div>
     </div>
   )
