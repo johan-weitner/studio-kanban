@@ -5,6 +5,7 @@ import { authClient } from './auth'
 import { apiFetch } from './api/client'
 import { Board } from './components/board/Board/Board'
 import { BoardHeader } from './components/board/BoardHeader/BoardHeader'
+import { SequencingView } from './components/sequencing/SequencingView/SequencingView'
 import { ColumnManager } from './components/column/ColumnManager/ColumnManager'
 import { AppShell } from './components/layout/AppShell/AppShell'
 import { LoginPage } from './components/auth/LoginPage/LoginPage'
@@ -19,6 +20,7 @@ export default function App() {
   const { data: session, isPending } = authClient.useSession()
   const activeProjectId = useUIStore((s) => s.activeProjectId)
   const setActiveProjectId = useUIStore((s) => s.setActiveProjectId)
+  const activeView = useUIStore((s) => s.activeView)
   const qc = useQueryClient()
 
   // Handle ?join=<token> invite links after the session is established
@@ -54,7 +56,14 @@ export default function App() {
       {activeProjectId ? (
         <div className={styles.boardContainer}>
           <BoardHeader projectId={activeProjectId} />
-          <Board projectId={activeProjectId} />
+          {/* Both views stay mounted so the SoundCloud iframe is never destroyed.
+              CSS visibility toggling keeps the inactive view out of sight. */}
+          <div style={{ display: activeView === 'board' ? 'contents' : 'none' }}>
+            <Board projectId={activeProjectId} />
+          </div>
+          <div style={{ display: activeView === 'sequence' ? 'contents' : 'none' }}>
+            <SequencingView projectId={activeProjectId} />
+          </div>
         </div>
       ) : (
         <div className={styles.emptyState}>

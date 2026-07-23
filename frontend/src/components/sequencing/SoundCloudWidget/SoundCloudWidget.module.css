@@ -1,0 +1,6 @@
+.widget {
+  display: block;
+  border: none;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}

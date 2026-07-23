@@ -1,0 +1,10 @@
+.player {
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
+}
+
+.iframe {
+  display: block;
+  border: none;
+}

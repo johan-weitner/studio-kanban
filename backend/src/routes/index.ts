@@ -8,6 +8,7 @@ import { requireAuth } from '../middleware/requireAuth';
 import { exportRouter } from './export';
 import { importRouter } from './import';
 import { invitesRouter } from './invites';
+import { soundcloudRouter } from './soundcloud';
 
 export const router = Router();
 
@@ -22,3 +23,4 @@ router.use('/subtasks', subtasksRouter);
 router.use('/export', exportRouter);
 router.use('/import', importRouter);
 router.use('/', invitesRouter);
+router.use('/', soundcloudRouter);

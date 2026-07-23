@@ -3,6 +3,8 @@ import { create } from 'zustand'
 interface UIStore {
   activeProjectId: string | null
   setActiveProjectId: (id: string | null) => void
+  activeView: 'board' | 'sequence'
+  setActiveView: (view: 'board' | 'sequence') => void
   taskDetailId: string | null
   openTaskDetail: (taskId: string) => void
   closeTaskDetail: () => void
@@ -22,7 +24,10 @@ interface UIStore {
 
 export const useUIStore = create<UIStore>((set) => ({
   activeProjectId: null,
-  setActiveProjectId: (id) => set({ activeProjectId: id }),
+  setActiveProjectId: (id) => set({ activeProjectId: id, activeView: 'board' }),
+
+  activeView: 'board',
+  setActiveView: (view) => set({ activeView: view }),
 
   taskDetailId: null,
   openTaskDetail: (taskId) => set({ taskDetailId: taskId }),

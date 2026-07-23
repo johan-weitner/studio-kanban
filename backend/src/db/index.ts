@@ -131,10 +131,34 @@ export function initDb(): void {
     CREATE INDEX IF NOT EXISTS "verification_identifier_idx" ON "verification"("identifier");
   `);
 
-  // Migrate existing DBs: add owner_id if created before auth was added
-  try {
-    sqlite.exec('ALTER TABLE projects ADD COLUMN owner_id TEXT;');
-  } catch {
-    // Column already exists — nothing to do
+  // New tables for SoundCloud sequencing
+  sqlite.exec(`
+    CREATE TABLE IF NOT EXISTS project_sequences (
+      id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      sc_track_id TEXT NOT NULL,
+      title TEXT NOT NULL,
+      artwork_url TEXT,
+      permalink_url TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'unapproved',
+      position INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP)
+    );
+    CREATE TABLE IF NOT EXISTS soundcloud_tokens (
+      id TEXT NOT NULL PRIMARY KEY DEFAULT 'singleton',
+      access_token TEXT NOT NULL,
+      refresh_token TEXT,
+      expires_at TEXT NOT NULL
+    );
+  `);
+
+  // Migrate existing DBs: add columns added after initial schema
+  const migrations = [
+    'ALTER TABLE projects ADD COLUMN owner_id TEXT;',
+    'ALTER TABLE projects ADD COLUMN soundcloud_playlist_url TEXT;',
+    'ALTER TABLE projects ADD COLUMN soundcloud_secret_token TEXT;',
+  ];
+  for (const sql of migrations) {
+    try { sqlite.exec(sql); } catch { /* column already exists */ }
   }
 }
