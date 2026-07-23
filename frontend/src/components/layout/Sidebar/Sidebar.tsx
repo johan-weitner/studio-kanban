@@ -32,11 +32,20 @@ export function Sidebar() {
   const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    const text = await file.text()
-    const json = JSON.parse(text)
-    await apiFetch('/import', { method: 'POST', body: JSON.stringify(json) })
-    qc.invalidateQueries({ queryKey: ['projects'] })
-    e.target.value = ''
+    try {
+      const text = await file.text()
+      const json = JSON.parse(text)
+      const result = await apiFetch<{ importedProjects: number; importedSongs: number; importedTasks: number }>(
+        '/import',
+        { method: 'POST', body: JSON.stringify(json) }
+      )
+      qc.invalidateQueries({ queryKey: ['projects'] })
+      alert(`Imported ${result.importedProjects} project(s), ${result.importedSongs} song(s), ${result.importedTasks} task(s).`)
+    } catch (err) {
+      alert(`Import failed: ${err instanceof Error ? err.message : 'Unknown error'}`)
+    } finally {
+      e.target.value = ''
+    }
   }
 
   return (
