@@ -36,6 +36,8 @@ export function TaskDetail() {
 	const [assignee, setAssignee] = useState("");
 	const [columnId, setColumnId] = useState("");
 	const [newSubtask, setNewSubtask] = useState("");
+	const [editingSubtaskId, setEditingSubtaskId] = useState<string | null>(null);
+	const [editingSubtaskTitle, setEditingSubtaskTitle] = useState("");
 
 	useEffect(() => {
 		if (task) {
@@ -79,6 +81,22 @@ export function TaskDetail() {
 
 	const handleDeleteSubtask = (subtaskId: string) => {
 		deleteSubtask.mutate({ id: subtaskId, taskId: task.id });
+	};
+
+	const startEditSubtask = (id: string, currentTitle: string) => {
+		setEditingSubtaskId(id);
+		setEditingSubtaskTitle(currentTitle);
+	};
+
+	const commitEditSubtask = () => {
+		if (editingSubtaskId && editingSubtaskTitle.trim()) {
+			updateSubtask.mutate({ id: editingSubtaskId, taskId: task.id, title: editingSubtaskTitle.trim() });
+		}
+		setEditingSubtaskId(null);
+	};
+
+	const cancelEditSubtask = () => {
+		setEditingSubtaskId(null);
 	};
 
 	return (
@@ -158,14 +176,30 @@ export function TaskDetail() {
 												✓
 											</Checkbox.Indicator>
 										</Checkbox.Root>
-										<Term
-											className={[
-												styles.subtaskTitle,
-												subtask.completed ? styles.completed : '',
-											].filter(Boolean).join(' ')}
-										>
-											{subtask.title}
-										</Term>
+										{editingSubtaskId === subtask.id ? (
+											<input
+												className={styles.subtaskEditInput}
+												value={editingSubtaskTitle}
+												autoFocus
+												onChange={(e) => setEditingSubtaskTitle(e.target.value)}
+												onBlur={commitEditSubtask}
+												onKeyDown={(e) => {
+													if (e.key === 'Enter') commitEditSubtask();
+													if (e.key === 'Escape') cancelEditSubtask();
+												}}
+											/>
+										) : (
+											<Term
+												className={[
+													styles.subtaskTitle,
+													subtask.completed ? styles.completed : '',
+												].filter(Boolean).join(' ')}
+												onDoubleClick={() => startEditSubtask(subtask.id, subtask.title)}
+												title="Double-click to edit"
+											>
+												{subtask.title}
+											</Term>
+										)}
 										<button
 											type="button"
 											className={styles.deleteSubtask}

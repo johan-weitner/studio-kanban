@@ -119,6 +119,19 @@
 .subtaskTitle {
   flex: 1;
   font-size: var(--text-sm);
+  cursor: text;
+}
+
+.subtaskEditInput {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border-focus);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  padding: 2px var(--space-2);
+  outline: none;
 }
 
 .subtaskTitle.completed {
