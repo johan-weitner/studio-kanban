@@ -3,6 +3,7 @@ import { sql } from 'drizzle-orm';
 
 export const projects = sqliteTable('projects', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  ownerId: text('owner_id'), // nullable — populated after auth is wired; enforced at app level
   name: text('name').notNull(),
   description: text('description'),
   createdAt: text('created_at').notNull().default(sql`(CURRENT_TIMESTAMP)`),

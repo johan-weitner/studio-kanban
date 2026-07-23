@@ -3,6 +3,7 @@ import { Term } from '../../ui/Term/Term'
 import { Button } from '../../ui/Button/Button'
 import { useProjects } from '../../../hooks/useProjects'
 import { useUIStore } from '../../../stores/useUIStore'
+import { authClient } from '../../../auth'
 
 export function Sidebar() {
   const { data: projects, isLoading } = useProjects()
@@ -10,6 +11,7 @@ export function Sidebar() {
   const setActiveProjectId = useUIStore((s) => s.setActiveProjectId)
   const openCreateProject = useUIStore((s) => s.openCreateProject)
   const openEditProject = useUIStore((s) => s.openEditProject)
+  const { data: session } = authClient.useSession()
 
   return (
     <div className={styles.sidebar}>
@@ -61,6 +63,25 @@ export function Sidebar() {
         <Button variant="ghost" size="sm" onClick={openCreateProject} className={styles.newBtn}>
           <Term>+ New Project</Term>
         </Button>
+        {session?.user && (
+          <div className={styles.user}>
+            {session.user.image ? (
+              <img src={session.user.image} alt={session.user.name ?? ''} className={styles.avatar} />
+            ) : (
+              <div className={styles.avatarFallback}>
+                <Term>{(session.user.name ?? '?')[0].toUpperCase()}</Term>
+              </div>
+            )}
+            <Term className={styles.userName} variant="muted">{session.user.name}</Term>
+            <button
+              className={styles.signOutBtn}
+              onClick={() => authClient.signOut()}
+              aria-label="Sign out"
+            >
+              →
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

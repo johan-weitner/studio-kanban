@@ -4,8 +4,12 @@ import { columnsRouter } from './columns';
 import { songsRouter } from './songs';
 import { tasksRouter } from './tasks';
 import { subtasksRouter } from './subtasks';
+import { requireAuth } from '../middleware/requireAuth';
 
 export const router = Router();
+
+// All API routes require an authenticated session
+router.use(requireAuth);
 
 router.use('/projects', projectsRouter);
 router.use('/columns', columnsRouter);

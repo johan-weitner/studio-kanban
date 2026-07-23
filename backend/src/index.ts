@@ -1,6 +1,9 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import { toNodeHandler } from 'better-auth/node';
+import { auth } from './auth';
 import { initDb } from './db/index';
 import { router } from './routes/index';
 import { openapiRouter } from './openapi';
@@ -8,11 +11,17 @@ import { openapiRouter } from './openapi';
 const app = express();
 const PORT = process.env.PORT ?? 3001;
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.BETTER_AUTH_URL ?? 'http://localhost:5173',
+  credentials: true,
+}));
 app.use(express.json());
 
 // Initialize DB tables
 initDb();
+
+// Auth handler — must be mounted BEFORE the API router
+app.all('/api/auth/*', toNodeHandler(auth));
 
 // Mount routes
 app.use('/api', router);

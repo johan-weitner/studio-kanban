@@ -6,6 +6,8 @@ services:
       - db-data:/app/data        # SQLite persistence
     ports:
       - "3001:3001"
+    env_file:
+      - .env
     environment:
       - DATABASE_URL=/app/data/studio-kanban.db
       - NODE_ENV=development
