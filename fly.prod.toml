@@ -1,7 +1,7 @@
-# Demo instance — single-user, no auth (deployed from single-user-demo branch)
+# Production instance — full auth + SoundCloud (deployed from main branch)
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 
-app = 'studio-kanban'
+app = 'studio-kanban-prod'
 primary_region = 'arn'
 
 [build]

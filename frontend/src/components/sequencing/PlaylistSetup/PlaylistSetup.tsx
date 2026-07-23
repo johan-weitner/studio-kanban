@@ -11,13 +11,11 @@ interface PlaylistSetupProps {
 
 export function PlaylistSetup({ onConnect, connecting }: PlaylistSetupProps) {
   const [url, setUrl] = useState('')
-  const [secretToken, setSecretToken] = useState('')
-  const [showSecret, setShowSecret] = useState(false)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!url.trim()) return
-    onConnect(url.trim(), secretToken.trim() || undefined)
+    onConnect(url.trim()) // backend auto-extracts secret token from the URL
   }
 
   return (

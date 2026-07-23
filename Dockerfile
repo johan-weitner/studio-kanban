@@ -10,7 +10,7 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends python3 make g++ \
   && rm -rf /var/lib/apt/lists/*
 WORKDIR /app/backend
-COPY backend/package*.json ./
+COPY backend/package*.json backend/.npmrc ./
 RUN npm ci
 COPY backend/ ./
 RUN npm run build && npm prune --omit=dev
