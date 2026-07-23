@@ -5,6 +5,14 @@
   overflow: hidden;
 }
 
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: var(--bg-base);
+}
+
 .emptyState {
   display: flex;
   flex-direction: column;

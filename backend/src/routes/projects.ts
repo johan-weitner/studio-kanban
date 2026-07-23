@@ -16,9 +16,9 @@ const DEFAULT_COLUMNS = [
 ];
 
 // GET /api/projects
-projectsRouter.get('/', async (_req, res) => {
+projectsRouter.get('/', async (req, res) => {
   try {
-    const result = await db.select().from(projects);
+    const result = await db.select().from(projects).where(eq(projects.ownerId, req.user.id));
     res.json(result);
   } catch (err: unknown) {
     console.error(err);
@@ -34,7 +34,7 @@ projectsRouter.post('/', async (req, res) => {
     return;
   }
   try {
-    const [project] = await db.insert(projects).values(parsed.data).returning();
+    const [project] = await db.insert(projects).values({ ...parsed.data, ownerId: req.user.id }).returning();
     await db.insert(columns).values(
       DEFAULT_COLUMNS.map((col) => ({ ...col, projectId: project.id }))
     );
@@ -68,15 +68,14 @@ projectsRouter.put('/:id', async (req, res) => {
     return;
   }
   try {
+    const [existing] = await db.select().from(projects).where(eq(projects.id, req.params.id));
+    if (!existing) { res.status(404).json({ error: 'Project not found' }); return; }
+    if (existing.ownerId !== req.user.id) { res.status(403).json({ error: 'Forbidden' }); return; }
     const [updated] = await db
       .update(projects)
       .set({ ...parsed.data, updatedAt: new Date().toISOString() })
       .where(eq(projects.id, req.params.id))
       .returning();
-    if (!updated) {
-      res.status(404).json({ error: 'Project not found' });
-      return;
-    }
     res.json(updated);
   } catch (err: unknown) {
     console.error(err);
@@ -87,11 +86,10 @@ projectsRouter.put('/:id', async (req, res) => {
 // DELETE /api/projects/:id
 projectsRouter.delete('/:id', async (req, res) => {
   try {
-    const deleted = await db.delete(projects).where(eq(projects.id, req.params.id)).returning();
-    if (!deleted.length) {
-      res.status(404).json({ error: 'Project not found' });
-      return;
-    }
+    const [existing] = await db.select().from(projects).where(eq(projects.id, req.params.id));
+    if (!existing) { res.status(404).json({ error: 'Project not found' }); return; }
+    if (existing.ownerId !== req.user.id) { res.status(403).json({ error: 'Forbidden' }); return; }
+    await db.delete(projects).where(eq(projects.id, req.params.id));
     res.status(204).send();
   } catch (err: unknown) {
     console.error(err);
