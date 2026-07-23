@@ -1,0 +1,81 @@
+.card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  touch-action: none;
+  user-select: none;
+}
+
+.card:hover {
+  background: var(--bg-card-hover);
+  box-shadow: var(--shadow-sm);
+}
+
+.card.active {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+.card.dragging {
+  opacity: 0.4;
+}
+
+.trackNumber {
+  font-size: var(--text-xl);
+  font-weight: var(--fw-bold);
+  color: var(--accent);
+  min-width: 2.5ch;
+  text-align: right;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.artwork {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--bg-input);
+}
+
+.artworkImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.artworkFallback {
+  width: 100%;
+  height: 100%;
+  background: var(--border);
+}
+
+.meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.title {
+  font-size: var(--text-sm);
+  font-weight: var(--fw-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.playingBadge {
+  font-size: var(--text-xs);
+  color: var(--accent);
+  font-weight: var(--fw-medium);
+}

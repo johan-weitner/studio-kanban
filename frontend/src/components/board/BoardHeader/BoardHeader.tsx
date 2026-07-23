@@ -15,6 +15,8 @@ export function BoardHeader({ projectId }: BoardHeaderProps) {
 	const openSongManager = useUIStore((s) => s.openSongManager);
 	const openColumnManager = useUIStore((s) => s.openColumnManager);
 	const openEditProject = useUIStore((s) => s.openEditProject);
+	const activeView = useUIStore((s) => s.activeView);
+	const setActiveView = useUIStore((s) => s.setActiveView);
 	const [inviteURL, setInviteURL] = useState<string | null>(null);
 	const [copied, setCopied] = useState(false);
 
@@ -40,6 +42,21 @@ export function BoardHeader({ projectId }: BoardHeaderProps) {
 				{project?.description && (
 					<Term variant="muted">{project.description}</Term>
 				)}
+				{/* View toggle — visually distinct from the action buttons */}
+				<div className={styles.viewToggle}>
+					<button
+						className={[styles.viewBtn, activeView === 'board' ? styles.viewBtnActive : ''].filter(Boolean).join(' ')}
+						onClick={() => setActiveView('board')}
+					>
+						<Term>Board</Term>
+					</button>
+					<button
+						className={[styles.viewBtn, activeView === 'sequence' ? styles.viewBtnActive : ''].filter(Boolean).join(' ')}
+						onClick={() => setActiveView('sequence')}
+					>
+						<Term>Sequence</Term>
+					</button>
+				</div>
 			</div>
 			<div className={styles.actions}>
 				{inviteURL ? (
