@@ -18,8 +18,13 @@ export function useCreateSubtask() {
         method: 'POST',
         body: JSON.stringify({ title }),
       }),
-    onSuccess: (_data, variables) => {
-      qc.invalidateQueries({ queryKey: ['subtasks', variables.taskId] })
+    onSuccess: (newSubtask, variables) => {
+      // Immediately append to cache so the UI updates without waiting for a refetch
+      qc.setQueryData<Subtask[]>(
+        ['subtasks', variables.taskId],
+        (old) => [...(old ?? []), newSubtask]
+      )
+      // Background-refetch task to keep subtask badge count in sync
       qc.invalidateQueries({ queryKey: ['task', variables.taskId] })
     },
   })
@@ -50,7 +55,11 @@ export function useDeleteSubtask() {
     mutationFn: ({ id }: { id: string; taskId: string }) =>
       apiFetch<void>(`/subtasks/${id}`, { method: 'DELETE' }),
     onSuccess: (_data, variables) => {
-      qc.invalidateQueries({ queryKey: ['subtasks', variables.taskId] })
+      // Immediately remove from cache so the UI updates without waiting for a refetch
+      qc.setQueryData<Subtask[]>(
+        ['subtasks', variables.taskId],
+        (old) => (old ?? []).filter((s) => s.id !== variables.id)
+      )
       qc.invalidateQueries({ queryKey: ['task', variables.taskId] })
     },
   })
