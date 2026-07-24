@@ -60,25 +60,6 @@ Then `docker compose up --build`.
 - **Subtask** — checklist item within a task
 - **Sequence** — the approved tracklist order for a project’s SoundCloud playlist
 
-## Deployment
-
-Two Fly.io instances are maintained:
-
-| Instance | Branch | URL |
-|---|---|---|
-| Demo (single-user) | `single-user-demo` | [studio-kanban.fly.dev](https://studio-kanban.fly.dev/) |
-| Production (multi-user) | `main` | [studio-kanban-prod.fly.dev](https://studio-kanban-prod.fly.dev/) |
-
-```bash
-# Deploy demo
-git checkout single-user-demo
-fly deploy --remote-only
-
-# Deploy production
-git checkout main
-fly deploy --remote-only --config fly.prod.toml
-```
-
 ## Development
 
 | Service  | URL |
