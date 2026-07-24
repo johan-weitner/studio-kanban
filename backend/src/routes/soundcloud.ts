@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { eq, and } from 'drizzle-orm';
 import { db } from '../db/index';
-import { projects, projectSequences, projectMembers } from '../db/schema';
+import { projects, projectSequences } from '../db/schema';
 import { scGet } from '../soundcloud/tokenManager';
 import { z } from 'zod';
 
@@ -38,11 +38,6 @@ soundcloudRouter.patch('/projects/:id/soundcloud', async (req, res) => {
 
     const [project] = await db.select().from(projects).where(eq(projects.id, req.params.id));
     if (!project) { res.status(404).json({ error: 'Project not found' }); return; }
-    // Allow if the project is unowned, owned by this user, or this user is a member
-    const isOwner = !project.ownerId || project.ownerId === req.user?.id;
-    const [membership] = isOwner ? [true] : await db.select().from(projectMembers)
-      .where(and(eq(projectMembers.projectId, project.id), eq(projectMembers.userId, req.user?.id ?? '')));
-    if (!isOwner && !membership) { res.status(403).json({ error: 'Forbidden' }); return; }
 
     // Auto-extract the secret token if it's embedded in the URL path (/s-TOKEN)
     // and strip tracking query params — SC only cares about the path

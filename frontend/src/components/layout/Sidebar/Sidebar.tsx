@@ -5,7 +5,6 @@ import { Term } from '../../ui/Term/Term'
 import { Button } from '../../ui/Button/Button'
 import { useProjects } from '../../../hooks/useProjects'
 import { useUIStore } from '../../../stores/useUIStore'
-import { authClient } from '../../../auth'
 import { apiFetch } from '../../../api/client'
 
 export function Sidebar() {
@@ -14,7 +13,6 @@ export function Sidebar() {
   const setActiveProjectId = useUIStore((s) => s.setActiveProjectId)
   const openCreateProject = useUIStore((s) => s.openCreateProject)
   const openEditProject = useUIStore((s) => s.openEditProject)
-  const { data: session } = authClient.useSession()
   const importRef = useRef<HTMLInputElement>(null)
   const qc = useQueryClient()
 
@@ -113,25 +111,6 @@ export function Sidebar() {
             onChange={handleImportFile}
           />
         </div>
-        {session?.user && (
-          <div className={styles.user}>
-            {session.user.image ? (
-              <img src={session.user.image} alt={session.user.name ?? ''} className={styles.avatar} />
-            ) : (
-              <div className={styles.avatarFallback}>
-                <Term>{(session.user.name ?? '?')[0].toUpperCase()}</Term>
-              </div>
-            )}
-            <Term className={styles.userName} variant="muted">{session.user.name}</Term>
-            <button
-              className={styles.signOutBtn}
-              onClick={() => authClient.signOut()}
-              aria-label="Sign out"
-            >
-              →
-            </button>
-          </div>
-        )}
       </div>
     </div>
   )

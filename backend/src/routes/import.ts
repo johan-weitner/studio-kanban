@@ -62,7 +62,7 @@ importRouter.post('/', async (req, res) => {
       // Create project
       const [project] = await db
         .insert(projects)
-        .values({ name: projectData.name, description: projectData.description ?? null, ownerId: req.user?.id ?? null })
+        .values({ name: projectData.name, description: projectData.description ?? null })
         .returning();
 
       // Create columns and build name → new ID map

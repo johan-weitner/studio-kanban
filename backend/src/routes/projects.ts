@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { eq, or, inArray } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { db } from '../db/index';
-import { projects, columns, songs, projectMembers } from '../db/schema';
+import { projects, columns, songs } from '../db/schema';
 import { CreateProjectSchema, UpdateProjectSchema } from '../schemas/projects';
 import { CreateColumnSchema } from '../schemas/columns';
 import { CreateSongSchema } from '../schemas/songs';
@@ -15,23 +15,10 @@ const DEFAULT_COLUMNS = [
   { name: 'Discarded',   color: '#EF4444', order: 3 },
 ];
 
-// GET /api/projects — owned projects + projects where user is a member
-projectsRouter.get('/', async (req, res) => {
+// GET /api/projects
+projectsRouter.get('/', async (_req, res) => {
   try {
-    const memberships = await db
-      .select({ projectId: projectMembers.projectId })
-      .from(projectMembers)
-      .where(eq(projectMembers.userId, req.user.id));
-    const memberProjectIds = memberships.map((m) => m.projectId);
-
-    const result = await db
-      .select()
-      .from(projects)
-      .where(
-        memberProjectIds.length > 0
-          ? or(eq(projects.ownerId, req.user.id), inArray(projects.id, memberProjectIds))
-          : eq(projects.ownerId, req.user.id)
-      );
+    const result = await db.select().from(projects);
     res.json(result);
   } catch (err: unknown) {
     console.error(err);
@@ -47,7 +34,7 @@ projectsRouter.post('/', async (req, res) => {
     return;
   }
   try {
-    const [project] = await db.insert(projects).values({ ...parsed.data, ownerId: req.user.id }).returning();
+    const [project] = await db.insert(projects).values(parsed.data).returning();
     await db.insert(columns).values(
       DEFAULT_COLUMNS.map((col) => ({ ...col, projectId: project.id }))
     );
@@ -83,7 +70,6 @@ projectsRouter.put('/:id', async (req, res) => {
   try {
     const [existing] = await db.select().from(projects).where(eq(projects.id, req.params.id));
     if (!existing) { res.status(404).json({ error: 'Project not found' }); return; }
-    if (existing.ownerId !== req.user.id) { res.status(403).json({ error: 'Forbidden' }); return; }
     const [updated] = await db
       .update(projects)
       .set({ ...parsed.data, updatedAt: new Date().toISOString() })
@@ -101,7 +87,6 @@ projectsRouter.delete('/:id', async (req, res) => {
   try {
     const [existing] = await db.select().from(projects).where(eq(projects.id, req.params.id));
     if (!existing) { res.status(404).json({ error: 'Project not found' }); return; }
-    if (existing.ownerId !== req.user.id) { res.status(403).json({ error: 'Forbidden' }); return; }
     await db.delete(projects).where(eq(projects.id, req.params.id));
     res.status(204).send();
   } catch (err: unknown) {
