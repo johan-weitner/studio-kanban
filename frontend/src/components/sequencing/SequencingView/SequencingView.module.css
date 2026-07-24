@@ -48,8 +48,15 @@
   background: var(--accent-subtle);
 }
 
+.panelsRow {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
 .divider {
-  height: 1px;
+  width: 1px;
   background: var(--border);
   flex-shrink: 0;
 }

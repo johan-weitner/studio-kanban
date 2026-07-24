@@ -7,4 +7,7 @@
 .iframe {
   display: block;
   border: none;
+  /* invert(1) flips light/dark; hue-rotate(180deg) brings the SC orange back
+     to ~its original hue, so brand colours survive the dark-mode trick. */
+  filter: invert(1) hue-rotate(180deg);
 }
