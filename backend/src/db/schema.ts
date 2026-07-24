@@ -3,7 +3,6 @@ import { sql } from 'drizzle-orm';
 
 export const projects = sqliteTable('projects', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-  ownerId: text('owner_id'),
   name: text('name').notNull(),
   description: text('description'),
   soundcloudPlaylistUrl: text('soundcloud_playlist_url'),
@@ -41,23 +40,6 @@ export const tasks = sqliteTable('tasks', {
   order: integer('order').notNull().default(0),
   createdAt: text('created_at').notNull().default(sql`(CURRENT_TIMESTAMP)`),
   updatedAt: text('updated_at').notNull().default(sql`(CURRENT_TIMESTAMP)`),
-});
-
-export const projectMembers = sqliteTable('project_members', {
-  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-  projectId: text('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
-  userId: text('user_id').notNull(),
-  role: text('role').notNull().default('member'),
-  createdAt: text('created_at').notNull().default(sql`(CURRENT_TIMESTAMP)`),
-});
-
-export const projectInvites = sqliteTable('project_invites', {
-  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-  projectId: text('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
-  token: text('token').notNull().unique(),
-  createdBy: text('created_by').notNull(),
-  expiresAt: text('expires_at').notNull(),
-  createdAt: text('created_at').notNull().default(sql`(CURRENT_TIMESTAMP)`),
 });
 
 export const projectSequences = sqliteTable('project_sequences', {
