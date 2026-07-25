@@ -10,6 +10,8 @@ A Kanban board for music production. Organize albums, songs, and production task
 ### Board view
 ![Studio Kanban Screenshot](./assets/studio-kanban-screen-1.png)
 
+---
+
 ### Sequencing view
 ![Studio Kanban Screenshot](./assets/studio-kanban-screen-2.png)
 
