@@ -3,13 +3,14 @@
 A Kanban board for music production. Organize albums, songs, and production tasks — with a built-in Sequencing view for arranging your tracklist using SoundCloud.
 
 **Demo** (single-user): [https://demo.studiokanban.se/](https://demo.studiokanban.se/)
+**Production** (multi-user with authentication): [https://studiokanban.se/](https://studiokanban.se/)
 
 ## Features
 
 ### Board view
 - Projects with configurable columns (Pending → In Progress → Done → Discarded by default)
-- Songs as collapsible swimlane headers spanning all columns
-- Task cards with subtasks, assignee, description, and inline subtask editing
+- Songs as collapsible swimlanes
+- Task cards with subtasks, assignee, description
 - Drag cards freely between any column in either direction
 - Delete cards directly from the board with a confirmation prompt
 - Export all data to JSON / Import from a previous export
@@ -18,16 +19,16 @@ A Kanban board for music production. Organize albums, songs, and production task
 - Connect a SoundCloud playlist to a project (public or private via share link)
 - All tracks from the playlist appear in an **Unapproved** pool
 - Drag tracks into the **Album sequence** panel to set the tracklist order — each slot gets a large track number
-- The full playlist plays in a persistent dark-mode SoundCloud widget at the top; clicking a track card jumps the player to that track
+- The full playlist plays in a persistent SoundCloud widget at the top; clicking a track card jumps the player to that track
 - Switching to Board view keeps the player running in the background
 
-### Multi-user (authenticated build)
+### Multi-user
 - Google OAuth and email/password sign-in via Better Auth
 - Projects are private to their owner
 - Invite collaborators via a time-limited share link
 - User avatar and sign-out in the sidebar
 
-## Quick Start
+## Quick Start for development and local usage
 
 ```bash
 docker compose up --build
@@ -37,7 +38,7 @@ Open [http://localhost:5173](http://localhost:5173)
 
 > The database is created automatically on first run and persisted in a Docker volume.
 
-### Multi-user build
+### Multi-user
 
 Copy `.env.example` (or create `.env`) with:
 
