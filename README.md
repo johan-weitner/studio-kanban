@@ -4,6 +4,13 @@ A Kanban board for music production. Organize albums, songs, and production task
 
 **Demo** (single-user): [studio-kanban.fly.dev](https://studio-kanban.fly.dev/)
 
+## Screenshots
+### Board view
+![Studio Kanban Screenshot](./assets/studio-kanban-screen-1.png)
+
+### Sequencing view
+![Studio Kanban Screenshot](./assets/studio-kanban-screen-2.png)
+
 ## Features
 
 ### Board view
@@ -73,9 +80,6 @@ To regenerate frontend TypeScript types after backend changes:
 ```bash
 cd frontend && npm run generate:api
 ```
-
-## Screenshot
-![Studio Kanban Screenshot](./assets/studio-kanban-screenshot.png)
 
 ## Stack
 
