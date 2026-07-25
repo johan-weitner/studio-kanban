@@ -3,6 +3,7 @@
 A Kanban board for music production. Organize albums, songs, and production tasks — with a built-in Sequencing view for arranging your tracklist using SoundCloud.
 
 **Demo** (single-user): [https://demo.studiokanban.se/](https://demo.studiokanban.se/)
+
 **Production** (multi-user with authentication): [https://studiokanban.se/](https://studiokanban.se/)
 
 ## Screenshots
