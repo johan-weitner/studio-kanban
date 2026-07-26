@@ -70,17 +70,17 @@ export function TaskDetail() {
 
 	const handleAddSubtask = () => {
 		if (newSubtask.trim()) {
-			createSubtask.mutate({ taskId: task.id, title: newSubtask.trim() });
+			createSubtask.mutate({ taskId: task.id, songId: task.songId, title: newSubtask.trim() });
 			setNewSubtask("");
 		}
 	};
 
 	const handleToggleSubtask = (subtaskId: string, completed: boolean) => {
-		updateSubtask.mutate({ id: subtaskId, taskId: task.id, completed });
+		updateSubtask.mutate({ id: subtaskId, taskId: task.id, songId: task.songId, completed });
 	};
 
 	const handleDeleteSubtask = (subtaskId: string) => {
-		deleteSubtask.mutate({ id: subtaskId, taskId: task.id });
+		deleteSubtask.mutate({ id: subtaskId, taskId: task.id, songId: task.songId });
 	};
 
 	const startEditSubtask = (id: string, currentTitle: string) => {
@@ -90,7 +90,7 @@ export function TaskDetail() {
 
 	const commitEditSubtask = () => {
 		if (editingSubtaskId && editingSubtaskTitle.trim()) {
-			updateSubtask.mutate({ id: editingSubtaskId, taskId: task.id, title: editingSubtaskTitle.trim() });
+		updateSubtask.mutate({ id: editingSubtaskId, taskId: task.id, songId: task.songId, title: editingSubtaskTitle.trim() });
 		}
 		setEditingSubtaskId(null);
 	};
