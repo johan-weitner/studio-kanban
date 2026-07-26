@@ -13,7 +13,7 @@ export function useSubtasks(taskId: string) {
 export function useCreateSubtask() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ taskId, title }: { taskId: string; title: string }) =>
+    mutationFn: ({ taskId, songId: _s, title }: { taskId: string; songId: string; title: string }) =>
       apiFetch<Subtask>(`/tasks/${taskId}/subtasks`, {
         method: 'POST',
         body: JSON.stringify({ title }),
@@ -24,8 +24,10 @@ export function useCreateSubtask() {
         ['subtasks', variables.taskId],
         (old) => [...(old ?? []), newSubtask]
       )
-      // Background-refetch task to keep subtask badge count in sync
+      // Invalidate both the single-task query (for the detail view) and the
+      // song's task list (for the board card badge)
       qc.invalidateQueries({ queryKey: ['task', variables.taskId] })
+      qc.invalidateQueries({ queryKey: ['tasks', variables.songId] })
     },
   })
 }
@@ -36,8 +38,9 @@ export function useUpdateSubtask() {
     mutationFn: ({
       id,
       taskId,
+      songId: _s,
       ...data
-    }: { id: string; taskId: string; title?: string; completed?: boolean }) =>
+    }: { id: string; taskId: string; songId: string; title?: string; completed?: boolean }) =>
       apiFetch<Subtask>(`/subtasks/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data),
@@ -45,6 +48,7 @@ export function useUpdateSubtask() {
     onSuccess: (_data, variables) => {
       qc.invalidateQueries({ queryKey: ['subtasks', variables.taskId] })
       qc.invalidateQueries({ queryKey: ['task', variables.taskId] })
+      qc.invalidateQueries({ queryKey: ['tasks', variables.songId] })
     },
   })
 }
@@ -52,7 +56,7 @@ export function useUpdateSubtask() {
 export function useDeleteSubtask() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ id }: { id: string; taskId: string }) =>
+    mutationFn: ({ id }: { id: string; taskId: string; songId: string }) =>
       apiFetch<void>(`/subtasks/${id}`, { method: 'DELETE' }),
     onSuccess: (_data, variables) => {
       // Immediately remove from cache so the UI updates without waiting for a refetch
@@ -61,6 +65,7 @@ export function useDeleteSubtask() {
         (old) => (old ?? []).filter((s) => s.id !== variables.id)
       )
       qc.invalidateQueries({ queryKey: ['task', variables.taskId] })
+      qc.invalidateQueries({ queryKey: ['tasks', variables.songId] })
     },
   })
 }

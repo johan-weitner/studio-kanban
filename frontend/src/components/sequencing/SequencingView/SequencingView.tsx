@@ -107,14 +107,14 @@ export function SequencingView({ projectId }: SequencingViewProps) {
   const [unapproved, setUnapproved] = useState<SequenceTrack[]>([])
   const [activeTrack, setActiveTrack] = useState<SequenceTrack | null>(null)
   const [activeScTrackId, setActiveScTrackId] = useState<string | null>(null)
-  const [synced, setSynced] = useState(false)
+  // Track which projectId was last synced so we re-apply when the project switches.
+  const [syncedProjectId, setSyncedProjectId] = useState<string | null>(null)
   const playTrackRef = useRef<(scTrackId: string) => void>(() => {})
 
-  // Sync local state from server when data first arrives or when explicitly reset.
-  if (data && !synced) {
+  if (data && syncedProjectId !== projectId) {
     setApproved(data.approved)
     setUnapproved(data.unapproved)
-    setSynced(true)
+    setSyncedProjectId(projectId)
   }
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
@@ -173,7 +173,7 @@ export function SequencingView({ projectId }: SequencingViewProps) {
         connecting={connectPlaylist.isPending}
         onConnect={async (url, secretToken) => {
           await connectPlaylist.mutateAsync({ playlistUrl: url, secretToken })
-          setSynced(false)
+          setSyncedProjectId(null)  // force re-sync after connecting a new playlist
           syncPlaylist.mutate()
         }}
       />
@@ -215,7 +215,7 @@ export function SequencingView({ projectId }: SequencingViewProps) {
             <div className={styles.panelHeader}>
               <Term variant="label" className={styles.panelTitle}>Unapproved tracks</Term>
               <Term variant="muted" className={styles.panelCount}>{unapproved.length} track{unapproved.length !== 1 ? 's' : ''}</Term>
-              <Button variant="ghost" size="sm" onClick={() => { setSynced(false); syncPlaylist.mutate(); }}>
+              <Button variant="ghost" size="sm" onClick={() => { setSyncedProjectId(null); syncPlaylist.mutate(); }}>
                 <Term>{syncPlaylist.isPending ? 'Syncing…' : 'Sync playlist'}</Term>
               </Button>
             </div>
