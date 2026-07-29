@@ -35,6 +35,8 @@
   color: var(--text-primary);
   line-height: 1.4;
   min-width: 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .deleteBtn {
