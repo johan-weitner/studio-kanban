@@ -26,6 +26,7 @@ import { TrackCard } from '../TrackCard/TrackCard'
 import { PlaylistSetup } from '../PlaylistSetup/PlaylistSetup'
 import { Term } from '../../ui/Term/Term'
 import { Button } from '../../ui/Button/Button'
+import { useUIStore } from '../../../stores/useUIStore'
 import styles from './SequencingView.module.css'
 
 interface SequencingViewProps {
@@ -102,6 +103,9 @@ export function SequencingView({ projectId }: SequencingViewProps) {
   const connectPlaylist = useConnectPlaylist(projectId)
   const syncPlaylist = useSyncPlaylist(projectId)
   const updateSequence = useUpdateSequence(projectId)
+  const openCommentDrawer = useUIStore((s) => s.openCommentDrawer)
+  const commentTarget = useUIStore((s) => s.commentTarget)
+  const isCommentOpen = commentTarget?.type === 'sequence' && commentTarget.projectId === projectId
 
   const [approved, setApproved] = useState<SequenceTrack[]>([])
   const [unapproved, setUnapproved] = useState<SequenceTrack[]>([])
@@ -217,6 +221,16 @@ export function SequencingView({ projectId }: SequencingViewProps) {
               <Term variant="muted" className={styles.panelCount}>{unapproved.length} track{unapproved.length !== 1 ? 's' : ''}</Term>
               <Button variant="ghost" size="sm" onClick={() => { setSyncedProjectId(null); syncPlaylist.mutate(); }}>
                 <Term>{syncPlaylist.isPending ? 'Syncing…' : 'Sync playlist'}</Term>
+              </Button>
+              <button
+                className={[styles.commentBtn, isCommentOpen ? styles.commentBtnActive : ''].filter(Boolean).join(' ')}
+                onClick={() => openCommentDrawer({ type: 'sequence', projectId, title: 'Album sequence' })}
+                aria-label="Sequence comments"
+                title="Comments on the sequence"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
               </Button>
             </div>
             <UnapprovedZone tracks={unapproved} activeScTrackId={activeScTrackId} onPlay={playTrack} />

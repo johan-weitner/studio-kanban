@@ -152,6 +152,23 @@ export function initDb(): void {
     );
   `);
 
+  sqlite.exec(`
+    CREATE TABLE IF NOT EXISTS comments (
+      id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      song_id TEXT REFERENCES songs(id) ON DELETE CASCADE,
+      author_id TEXT NOT NULL,
+      author_name TEXT NOT NULL,
+      author_image TEXT,
+      body TEXT NOT NULL,
+      parent_id TEXT REFERENCES comments(id) ON DELETE CASCADE,
+      created_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+      updated_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP)
+    );
+    CREATE INDEX IF NOT EXISTS comments_song_id_idx ON comments(song_id);
+    CREATE INDEX IF NOT EXISTS comments_parent_id_idx ON comments(parent_id);
+  `);
+
   // Migrate existing DBs: add columns added after initial schema
   const migrations = [
     'ALTER TABLE projects ADD COLUMN owner_id TEXT;',

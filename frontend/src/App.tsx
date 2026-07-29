@@ -13,6 +13,7 @@ import { Sidebar } from './components/layout/Sidebar/Sidebar'
 import { ProjectModal } from './components/project/ProjectModal/ProjectModal'
 import { SongManager } from './components/song/SongManager/SongManager'
 import { TaskDetail } from './components/task/TaskDetail/TaskDetail'
+import { CommentDrawer } from './components/comments/CommentDrawer/CommentDrawer'
 import { Term } from './components/ui/Term/Term'
 import { useUIStore } from './stores/useUIStore'
 
@@ -75,6 +76,7 @@ export default function App() {
       )}
       {/* Modals rendered at root level */}
       <TaskDetail />
+      <CommentDrawer />
       <ProjectModal />
       <SongManager />
       <ColumnManager />

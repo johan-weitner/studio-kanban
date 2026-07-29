@@ -9,6 +9,7 @@ import { exportRouter } from './export';
 import { importRouter } from './import';
 import { invitesRouter } from './invites';
 import { soundcloudRouter } from './soundcloud';
+import { commentsRouter } from './comments';
 
 export const router = Router();
 
@@ -24,3 +25,4 @@ router.use('/export', exportRouter);
 router.use('/import', importRouter);
 router.use('/', invitesRouter);
 router.use('/', soundcloudRouter);
+router.use('/', commentsRouter);

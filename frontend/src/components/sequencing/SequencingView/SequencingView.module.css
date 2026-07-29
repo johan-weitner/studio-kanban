@@ -114,6 +114,27 @@
   height: 100%;
 }
 
+.commentBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.commentBtn:hover {
+  color: var(--text-primary);
+  background: var(--bg-card-hover);
+}
+
+.commentBtnActive {
+  color: var(--accent);
+}
+
 .overlay {
   width: 320px;
   opacity: 0.85;

@@ -1,5 +1,9 @@
 import { create } from 'zustand'
 
+export type CommentTarget =
+  | { type: 'song'; id: string; title: string }
+  | { type: 'sequence'; projectId: string; title: string }
+
 interface UIStore {
   activeProjectId: string | null
   setActiveProjectId: (id: string | null) => void
@@ -20,6 +24,9 @@ interface UIStore {
   isColumnManagerOpen: boolean
   openColumnManager: () => void
   closeColumnManager: () => void
+  commentTarget: CommentTarget | null
+  openCommentDrawer: (target: CommentTarget) => void
+  closeCommentDrawer: () => void
 }
 
 export const useUIStore = create<UIStore>((set) => ({
@@ -48,4 +55,20 @@ export const useUIStore = create<UIStore>((set) => ({
   isColumnManagerOpen: false,
   openColumnManager: () => set({ isColumnManagerOpen: true }),
   closeColumnManager: () => set({ isColumnManagerOpen: false }),
+
+  commentTarget: null,
+  // Toggle: clicking the same target closes the drawer
+  openCommentDrawer: (target) => set((s) => ({
+    commentTarget:
+      s.commentTarget &&
+      s.commentTarget.type === target.type &&
+      (s.commentTarget.type === 'song' && target.type === 'song'
+        ? s.commentTarget.id === target.id
+        : s.commentTarget.type === 'sequence' && target.type === 'sequence'
+          ? s.commentTarget.projectId === target.projectId
+          : false)
+        ? null
+        : target,
+  })),
+  closeCommentDrawer: () => set({ commentTarget: null }),
 }))
