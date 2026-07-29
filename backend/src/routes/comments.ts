@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { eq, and, isNull, isNotNull } from 'drizzle-orm';
+import { eq, and, isNull, isNotNull, sql } from 'drizzle-orm';
 import { db } from '../db/index';
 import { comments, songs, projects } from '../db/schema';
 import { z } from 'zod';
@@ -51,6 +51,30 @@ function buildThread(rows: typeof comments.$inferSelect[]): ThreadResponse {
 const PostBodySchema = z.object({
   body: z.string().min(1).max(4000),
   parentId: z.string().optional(),
+});
+
+// ── GET /api/projects/:projectId/comment-counts ──────────────────────
+// Returns { bySong: { [songId]: count }, sequence: count } for the whole project.
+
+commentsRouter.get('/projects/:projectId/comment-counts', async (req, res) => {
+  try {
+    const rows = await db
+      .select({ songId: comments.songId, count: sql<number>`count(*)` })
+      .from(comments)
+      .where(eq(comments.projectId, req.params.projectId))
+      .groupBy(comments.songId);
+
+    const bySong: Record<string, number> = {};
+    let sequence = 0;
+    for (const row of rows) {
+      if (row.songId) bySong[row.songId] = Number(row.count);
+      else sequence = Number(row.count);
+    }
+    res.json({ bySong, sequence });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // ── GET /api/songs/:songId/comments ───────────────────────────────────────

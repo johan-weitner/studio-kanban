@@ -2,6 +2,7 @@ import type { Column, Song, Task } from '../../../api/types'
 import { Term } from '../../ui/Term/Term'
 import { SwimlaneCell } from '../SwimlaneCell/SwimlaneCell'
 import { useUIStore } from '../../../stores/useUIStore'
+import { useCommentCounts } from '../../../hooks/useComments'
 import styles from './Swimlane.module.css'
 
 interface SwimlaneProps {
@@ -16,6 +17,8 @@ export function Swimlane({ song, columns, tasks, collapsed, onToggleCollapse }: 
   const openCommentDrawer = useUIStore((s) => s.openCommentDrawer)
   const commentTarget = useUIStore((s) => s.commentTarget)
   const isCommentOpen = commentTarget?.type === 'song' && commentTarget.id === song.id
+  const { data: counts } = useCommentCounts(song.projectId)
+  const commentCount = counts?.bySong[song.id] ?? 0
   return (
     <>
       {/* Swimlane header — spans all columns */}
@@ -41,12 +44,15 @@ export function Swimlane({ song, columns, tasks, collapsed, onToggleCollapse }: 
         <button
           className={[styles.commentBtn, isCommentOpen ? styles.commentBtnActive : ''].filter(Boolean).join(' ')}
           onClick={() => openCommentDrawer({ type: 'song', id: song.id, title: song.title })}
-          aria-label="Comments"
+          aria-label={`Comments (${commentCount})`}
           title="Comments"
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
+          {commentCount > 0 && (
+            <span className={styles.commentCount}>{commentCount}</span>
+          )}
         </button>
       </div>
 

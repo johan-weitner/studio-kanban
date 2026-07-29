@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useUIStore } from '../../../stores/useUIStore'
+import type { CommentTarget } from '../../../stores/useUIStore'
 import { authClient } from '../../../auth'
 import {
   useComments,
@@ -88,17 +89,24 @@ function CommentRow({
 }
 
 // ── Main drawer ───────────────────────────────────────────────────────────
-
+// Outer gate — just controls mounting; keeps hooks out of the null case.
 export function CommentDrawer() {
   const target = useUIStore((s) => s.commentTarget)
+  if (!target) return null
+  return <CommentDrawerInner target={target} />
+}
+
+// Inner component — target is guaranteed non-null here so hooks are always
+// called with a valid value.
+function CommentDrawerInner({ target }: { target: CommentTarget }) {
   const close = useUIStore((s) => s.closeCommentDrawer)
   const { data: session } = authClient.useSession()
   const currentUserId = session?.user?.id
 
   const { data: thread } = useComments(target)
-  const createComment = useCreateComment(target!)
-  const updateComment = useUpdateComment(target!)
-  const deleteComment = useDeleteComment(target!)
+  const createComment = useCreateComment(target)
+  const updateComment = useUpdateComment(target)
+  const deleteComment = useDeleteComment(target)
 
   const [newBody, setNewBody] = useState('')
   const [replyingTo, setReplyingTo] = useState<Comment | null>(null)
@@ -115,15 +123,13 @@ export function CommentDrawer() {
     return () => document.removeEventListener('keydown', handler)
   }, [close])
 
-  // Focus input when drawer opens
+  // Reset and focus when the target changes
   useEffect(() => {
-    if (target) setTimeout(() => newBodyRef.current?.focus(), 100)
+    setTimeout(() => newBodyRef.current?.focus(), 100)
     setNewBody('')
     setReplyingTo(null)
     setEditingComment(null)
-  }, [target?.type === 'song' ? (target as { id: string }).id : (target as { projectId?: string } | null)?.projectId])
-
-  if (!target) return null
+  }, [target.type === 'song' ? target.id : target.projectId])
 
   const handlePost = () => {
     if (!newBody.trim()) return

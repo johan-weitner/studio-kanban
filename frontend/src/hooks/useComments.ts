@@ -28,6 +28,19 @@ function targetUrl(target: CommentTarget): string {
   return `/projects/${target.projectId}/sequence/comments`
 }
 
+export interface CommentCounts {
+  bySong: Record<string, number>
+  sequence: number
+}
+
+export function useCommentCounts(projectId: string | null) {
+  return useQuery<CommentCounts>({
+    queryKey: ['comment-counts', projectId],
+    queryFn: () => apiFetch(`/projects/${projectId}/comment-counts`),
+    enabled: !!projectId,
+  })
+}
+
 export function useComments(target: CommentTarget | null) {
   return useQuery<ThreadData>({
     queryKey: target ? targetKey(target) : ['comments', 'none'],
@@ -57,6 +70,11 @@ export function useCreateComment(target: CommentTarget) {
           replies: { ...old.replies, [newComment.parentId]: [...existing, newComment] },
         }
       })
+      // Refresh the count badge
+      const pid = target.type === 'song'
+        ? qc.getQueryData<{ projectId: string }>(['comments', 'song', target.id])
+        : { projectId: (target as { projectId: string }).projectId }
+      qc.invalidateQueries({ queryKey: ['comment-counts'] })
     },
   })
 }
@@ -112,6 +130,7 @@ export function useDeleteComment(target: CommentTarget) {
         )
         return { topLevel: topLevelFiltered, replies: repliesFiltered }
       })
+      qc.invalidateQueries({ queryKey: ['comment-counts'] })
     },
   })
 }
