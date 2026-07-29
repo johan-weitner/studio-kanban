@@ -170,11 +170,11 @@ export function SequencingView({ projectId }: SequencingViewProps) {
   if (!isLoading && data && !data.playlistUrl) {
     return (
       <PlaylistSetup
-        connecting={connectPlaylist.isPending}
+        connecting={connectPlaylist.isPending || syncPlaylist.isPending}
         onConnect={async (url, secretToken) => {
           await connectPlaylist.mutateAsync({ playlistUrl: url, secretToken })
           setSyncedProjectId(null)  // force re-sync after connecting a new playlist
-          syncPlaylist.mutate()
+          await syncPlaylist.mutateAsync()  // await so tracks are loaded before showing main view
         }}
       />
     )
