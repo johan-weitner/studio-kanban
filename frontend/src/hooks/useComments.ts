@@ -71,9 +71,6 @@ export function useCreateComment(target: CommentTarget) {
         }
       })
       // Refresh the count badge
-      const pid = target.type === 'song'
-        ? qc.getQueryData<{ projectId: string }>(['comments', 'song', target.id])
-        : { projectId: (target as { projectId: string }).projectId }
       qc.invalidateQueries({ queryKey: ['comment-counts'] })
     },
   })
