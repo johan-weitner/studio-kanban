@@ -61,6 +61,40 @@
 }
 
 .taskCount {
-  margin-left: auto;
   flex-shrink: 0;
+}
+
+.commentBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 22px;
+  padding: 0 4px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.commentBtn:hover {
+  color: var(--text-primary);
+  background: var(--bg-card);
+}
+
+.commentBtnActive {
+  color: var(--accent);
+}
+
+.commentCount {
+  font-size: 9px;
+  font-weight: var(--fw-bold);
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius-full);
+  min-width: 14px;
+  height: 14px;
+  line-height: 14px;
+  padding: 0 3px;
+  text-align: center;
 }

@@ -79,6 +79,19 @@ export const soundcloudTokens = sqliteTable('soundcloud_tokens', {
   expiresAt: text('expires_at').notNull(),
 });
 
+export const comments = sqliteTable('comments', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  projectId: text('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
+  songId: text('song_id').references(() => songs.id, { onDelete: 'cascade' }), // null = sequence-level
+  authorId: text('author_id').notNull(),
+  authorName: text('author_name').notNull(),
+  authorImage: text('author_image'),
+  body: text('body').notNull(),
+  parentId: text('parent_id'), // self-ref enforced at app level
+  createdAt: text('created_at').notNull().default(sql`(CURRENT_TIMESTAMP)`),
+  updatedAt: text('updated_at').notNull().default(sql`(CURRENT_TIMESTAMP)`),
+});
+
 export const subtasks = sqliteTable('subtasks', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   taskId: text('task_id').notNull().references(() => tasks.id, { onDelete: 'cascade' }),
