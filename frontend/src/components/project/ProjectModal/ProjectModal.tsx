@@ -12,6 +12,8 @@ import {
   useDeleteProject,
   useProject,
 } from '../../../hooks/useProjects'
+import { apiFetch } from '../../../api/client'
+import type { SequenceTrack } from '../../../hooks/useSequence'
 
 export function ProjectModal() {
   const isCreateOpen = useUIStore((s) => s.isCreateProjectOpen)
@@ -28,6 +30,8 @@ export function ProjectModal() {
 
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
+  const [playlistUrl, setPlaylistUrl] = useState('')
+  const [isCreating, setIsCreating] = useState(false)
 
   const isEditMode = !!editProjectId
   const isOpen = isCreateOpen || isEditMode
@@ -40,6 +44,7 @@ export function ProjectModal() {
     } else if (isCreateOpen) {
       setName('')
       setDescription('')
+      setPlaylistUrl('')
     }
   }, [editProject, isCreateOpen])
 
@@ -57,13 +62,44 @@ export function ProjectModal() {
         description: description.trim() || undefined,
       })
       closeEdit()
-    } else {
+      return
+    }
+
+    setIsCreating(true)
+    try {
+      // 1. Create the project
       const project = await createProject.mutateAsync({
         name: name.trim(),
         description: description.trim() || undefined,
       })
+
+      // 2. Optionally connect + sync the SoundCloud playlist
+      if (playlistUrl.trim()) {
+        // Save the URL (auto-extracts secret token from share links)
+        await apiFetch(`/projects/${project.id}/soundcloud`, {
+          method: 'PATCH',
+          body: JSON.stringify({ playlistUrl: playlistUrl.trim() }),
+        })
+
+        // Sync tracks from the SC playlist
+        const syncResult = await apiFetch<{ synced: number; tracks: SequenceTrack[] }>(
+          `/projects/${project.id}/soundcloud/sync`,
+          { method: 'POST' }
+        )
+
+        // Pre-populate the board with one song per SC track
+        for (let i = 0; i < syncResult.tracks.length; i++) {
+          await apiFetch(`/projects/${project.id}/songs`, {
+            method: 'POST',
+            body: JSON.stringify({ title: syncResult.tracks[i].title, order: i }),
+          })
+        }
+      }
+
       setActiveProjectId(project.id)
       closeCreate()
+    } finally {
+      setIsCreating(false)
     }
   }
 
@@ -100,6 +136,20 @@ export function ProjectModal() {
             rows={3}
           />
         </div>
+        {!isEditMode && (
+          <div className={styles.field}>
+            <Term as="label" variant="label">SoundCloud playlist (optional)</Term>
+            <Input
+              type="url"
+              value={playlistUrl}
+              onChange={(e) => setPlaylistUrl(e.target.value)}
+              placeholder="https://soundcloud.com/you/sets/my-album"
+            />
+            <Term variant="muted" className={styles.hint}>
+              Paste a public URL or full share link. Tracks will be added as songs on the board and connected to the Sequencing view.
+            </Term>
+          </div>
+        )}
       </div>
       <div className={styles.footer}>
         {isEditMode && (
@@ -115,9 +165,13 @@ export function ProjectModal() {
             variant="primary"
             size="sm"
             onClick={handleSubmit}
-            disabled={!name.trim()}
+            disabled={!name.trim() || isCreating}
           >
-            <Term>{isEditMode ? 'Save' : 'Create'}</Term>
+            <Term>
+              {isCreating
+                ? (playlistUrl.trim() ? 'Creating…' : 'Creating…')
+                : (isEditMode ? 'Save' : 'Create')}
+            </Term>
           </Button>
         </div>
       </div>
