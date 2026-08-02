@@ -5,7 +5,6 @@ import { Term } from '../../ui/Term/Term'
 import { Button } from '../../ui/Button/Button'
 import { useProjects } from '../../../hooks/useProjects'
 import { useUIStore } from '../../../stores/useUIStore'
-import { authClient } from '../../../auth'
 import { apiFetch } from '../../../api/client'
 
 export function Sidebar() {
@@ -14,7 +13,7 @@ export function Sidebar() {
   const setActiveProjectId = useUIStore((s) => s.setActiveProjectId)
   const openCreateProject = useUIStore((s) => s.openCreateProject)
   const openEditProject = useUIStore((s) => s.openEditProject)
-  const { data: session } = authClient.useSession()
+  const toggleSidebar = useUIStore((s) => s.toggleSidebar)
   const importRef = useRef<HTMLInputElement>(null)
   const qc = useQueryClient()
 
@@ -113,30 +112,13 @@ export function Sidebar() {
             onChange={handleImportFile}
           />
         </div>
-        {session?.user && (
-          <div className={styles.user}>
-            {session.user.image ? (
-              <img src={session.user.image} alt={session.user.name ?? ''} className={styles.avatar} />
-            ) : (
-              <div className={styles.avatarFallback}>
-                <Term>{(session.user.name ?? '?')[0].toUpperCase()}</Term>
-              </div>
-            )}
-            <Term className={styles.userName} variant="muted">{session.user.name}</Term>
-            <button
-              className={styles.signOutBtn}
-              onClick={() => authClient.signOut()}
-              aria-label="Sign out"
-              title="Sign out"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                <polyline points="16 17 21 12 16 7"/>
-                <line x1="21" y1="12" x2="9" y2="12"/>
-              </svg>
-            </button>
-          </div>
-        )}
+        {/* Collapse button */}
+        <button className={styles.collapseBtn} onClick={toggleSidebar} aria-label="Collapse sidebar" title="Collapse sidebar">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          <Term variant="muted" className={styles.collapseBtnLabel}>Collapse</Term>
+        </button>
       </div>
     </div>
   )

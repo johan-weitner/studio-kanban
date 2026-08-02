@@ -27,6 +27,8 @@ interface UIStore {
   commentTarget: CommentTarget | null
   openCommentDrawer: (target: CommentTarget) => void
   closeCommentDrawer: () => void
+  sidebarCollapsed: boolean
+  toggleSidebar: () => void
 }
 
 export const useUIStore = create<UIStore>((set) => ({
@@ -71,4 +73,7 @@ export const useUIStore = create<UIStore>((set) => ({
         : target,
   })),
   closeCommentDrawer: () => set({ commentTarget: null }),
+
+  sidebarCollapsed: false,
+  toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
 }))
