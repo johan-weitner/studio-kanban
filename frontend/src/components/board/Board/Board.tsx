@@ -107,7 +107,7 @@ export function Board({ projectId }: BoardProps) {
     )
   }
 
-  const gridTemplateColumns = `repeat(${columns.length}, minmax(180px, 300px))`
+  const gridTemplateColumns = `repeat(${columns.length}, minmax(180px, 1fr))`
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
