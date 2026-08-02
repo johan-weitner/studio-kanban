@@ -1,12 +1,13 @@
 .boardWrapper {
   flex: 1;
   overflow: auto;
-  padding: var(--space-4);
+  /* No padding here — it creates a gap that content scrolls into
+     and shows through around sticky headers. */
 }
 
 .board {
   display: grid;
-  min-width: max-content;
+  width: 100%; /* fill the wrapper; columns use 1fr from this width */
 }
 
 .colHeader {
