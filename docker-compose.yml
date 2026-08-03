@@ -18,6 +18,7 @@ services:
       - ./frontend/src:/app/src          # Vite watches src/
       - ./frontend/index.html:/app/index.html
       - ./frontend/public:/app/public
+      - ./frontend/vite.config.ts:/app/vite.config.ts  # pick up config changes without rebuild
     ports:
       - "5173:5173"
     environment:
