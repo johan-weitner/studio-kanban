@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import helmet from 'helmet';
 import cors from 'cors';
 import path from 'path';
 import { toNodeHandler } from 'better-auth/node';
@@ -11,6 +12,7 @@ import { openapiRouter } from './openapi';
 const app = express();
 const PORT = process.env.PORT ?? 3001;
 
+app.use(helmet());
 app.use(cors({
   origin: process.env.BETTER_AUTH_URL ?? 'http://localhost:5173',
   credentials: true,
