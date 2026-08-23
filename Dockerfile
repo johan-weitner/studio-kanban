@@ -20,9 +20,11 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=8080
 ENV DATABASE_URL=/data/studio-kanban.db
-COPY --from=backend-builder /app/backend/package*.json ./
-COPY --from=backend-builder /app/backend/node_modules ./node_modules
-COPY --from=backend-builder /app/backend/dist ./dist
-COPY --from=frontend-builder /app/frontend/dist ./public
+RUN mkdir /data && chown node:node /data
+COPY --chown=node:node --from=backend-builder /app/backend/package*.json ./
+COPY --chown=node:node --from=backend-builder /app/backend/node_modules ./node_modules
+COPY --chown=node:node --from=backend-builder /app/backend/dist ./dist
+COPY --chown=node:node --from=frontend-builder /app/frontend/dist ./public
+USER node
 EXPOSE 8080
 CMD ["node", "dist/index.js"]
