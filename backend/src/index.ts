@@ -11,13 +11,29 @@ import { openapiRouter } from './openapi';
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        'script-src': ["'self'", 'https://w.soundcloud.com'],
+        'frame-src': ["'self'", 'https://w.soundcloud.com'],
+        'img-src': [
+          "'self'",
+          'data:',
+          'https://*.sndcdn.com',
+          'https://*.googleusercontent.com',
+        ],
+      },
+    },
+  }),
+);
 
-app.use(helmet());
 app.use(cors({
   origin: process.env.BETTER_AUTH_URL ?? 'http://localhost:5173',
   credentials: true,
 }));
-app.use(express.json());
+app.use(express.json({ limit: '100kb' }));
 
 // Initialize DB tables
 initDb();

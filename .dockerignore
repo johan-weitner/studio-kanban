@@ -7,3 +7,4 @@ backend/dist
 frontend/dist
 npm-debug.log*
 data
+AIKIDO_ISSUES*
