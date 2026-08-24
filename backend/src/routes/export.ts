@@ -1,15 +1,30 @@
 import { Router } from 'express';
-import { eq } from 'drizzle-orm';
+import { eq, or, inArray } from 'drizzle-orm';
 import { db } from '../db/index';
-import { projects, columns, songs, tasks, subtasks } from '../db/schema';
+import { projects, columns, songs, tasks, subtasks, projectMembers } from '../db/schema';
 
 export const exportRouter = Router();
 
 // GET /api/export
-// Returns a full snapshot of all data, suitable for re-import.
-exportRouter.get('/', async (_req, res) => {
+// Returns a full snapshot of all data accessible to the authenticated user, suitable for re-import.
+exportRouter.get('/', async (req, res) => {
   try {
-    const allProjects = await db.select().from(projects);
+    // Get projects where user is a member
+    const memberships = await db
+      .select({ projectId: projectMembers.projectId })
+      .from(projectMembers)
+      .where(eq(projectMembers.userId, req.user.id));
+    const memberProjectIds = memberships.map((m) => m.projectId);
+
+    // Query only projects owned by user or where user is a member
+    const allProjects = await db
+      .select()
+      .from(projects)
+      .where(
+        memberProjectIds.length > 0
+          ? or(eq(projects.ownerId, req.user.id), inArray(projects.id, memberProjectIds))
+          : eq(projects.ownerId, req.user.id)
+      );
 
     const payload = await Promise.all(
       allProjects.map(async (project) => {
