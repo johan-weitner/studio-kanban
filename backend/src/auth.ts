@@ -1,7 +1,7 @@
-import { betterAuth } from 'better-auth';
+import { betterAuth, type BetterAuthOptions } from 'better-auth';
 import { sqlite } from './db/index';
 
-export const auth = betterAuth({
+export const authOptions: BetterAuthOptions = {
   database: sqlite,
   secret: process.env.BETTER_AUTH_SECRET!,
   baseURL: process.env.BETTER_AUTH_URL ?? 'http://localhost:5173',
@@ -22,7 +22,9 @@ export const auth = betterAuth({
     'https://localhost:5173',
     'http://localhost:3001',
   ],
-});
+};
+
+export const auth = betterAuth(authOptions);
 
 export type Session = typeof auth.$Infer.Session;
 export type User = typeof auth.$Infer.Session.user;

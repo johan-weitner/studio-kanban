@@ -4,7 +4,8 @@ import helmet from 'helmet';
 import cors from 'cors';
 import path from 'path';
 import { toNodeHandler } from 'better-auth/node';
-import { auth } from './auth';
+import { getMigrations } from 'better-auth/db/migration';
+import { auth, authOptions } from './auth';
 import { initDb } from './db/index';
 import { router } from './routes/index';
 import { openapiRouter } from './openapi';
@@ -61,7 +62,8 @@ async function startServer() {
 
   // Run better-auth schema migrations — automatically applies any new
   // columns/tables added in newer better-auth releases (e.g. account.issuer).
-  await auth.runMigrations();
+  const { runMigrations } = await getMigrations(authOptions);
+  await runMigrations();
 
   app.listen(PORT, () => {
     console.log(`Studio Kanban backend running on http://localhost:${PORT}`);
