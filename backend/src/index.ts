@@ -4,7 +4,8 @@ import helmet from 'helmet';
 import cors from 'cors';
 import path from 'path';
 import { toNodeHandler } from 'better-auth/node';
-import { auth } from './auth';
+import { getMigrations } from 'better-auth/db/migration';
+import { auth, authOptions } from './auth';
 import { initDb } from './db/index';
 import { router } from './routes/index';
 import { openapiRouter } from './openapi';
@@ -35,9 +36,6 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '100kb' }));
 
-// Initialize DB tables
-initDb();
-
 // Auth handler — must be mounted BEFORE the API router
 app.all('/api/auth/*', toNodeHandler(auth));
 
@@ -58,7 +56,22 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-app.listen(PORT, () => {
-  console.log(`Studio Kanban backend running on http://localhost:${PORT}`);
-  console.log(`OpenAPI spec: http://localhost:${PORT}/api/openapi.json`);
+async function startServer() {
+  // Initialize app DB tables
+  initDb();
+
+  // Run better-auth schema migrations — automatically applies any new
+  // columns/tables added in newer better-auth releases (e.g. account.issuer).
+  const { runMigrations } = await getMigrations(authOptions);
+  await runMigrations();
+
+  app.listen(PORT, () => {
+    console.log(`Studio Kanban backend running on http://localhost:${PORT}`);
+    console.log(`OpenAPI spec: http://localhost:${PORT}/api/openapi.json`);
+  });
+}
+
+startServer().catch((err) => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
 });
