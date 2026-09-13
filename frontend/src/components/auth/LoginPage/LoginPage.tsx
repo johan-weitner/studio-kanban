@@ -15,7 +15,7 @@ export function LoginPage() {
   const handleGoogleSignIn = () => {
     authClient.signIn.social({
       provider: 'google',
-      callbackURL: window.location.origin,
+      callbackURL: '/',
     })
   }
 
@@ -25,10 +25,10 @@ export function LoginPage() {
     setLoading(true)
     try {
       if (isSignUp) {
-        const result = await authClient.signUp.email({ name, email, password, callbackURL: window.location.origin })
+        const result = await authClient.signUp.email({ name, email, password, callbackURL: '/' })
         if (result.error) setError(result.error.message ?? 'Sign up failed')
       } else {
-        const result = await authClient.signIn.email({ email, password, callbackURL: window.location.origin })
+        const result = await authClient.signIn.email({ email, password, callbackURL: '/' })
         if (result.error) setError(result.error.message ?? 'Sign in failed')
       }
     } finally {
