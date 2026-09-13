@@ -35,9 +35,6 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '100kb' }));
 
-// Initialize DB tables
-initDb();
-
 // Auth handler — must be mounted BEFORE the API router
 app.all('/api/auth/*', toNodeHandler(auth));
 
@@ -58,7 +55,21 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-app.listen(PORT, () => {
-  console.log(`Studio Kanban backend running on http://localhost:${PORT}`);
-  console.log(`OpenAPI spec: http://localhost:${PORT}/api/openapi.json`);
+async function startServer() {
+  // Initialize app DB tables
+  initDb();
+
+  // Run better-auth schema migrations — automatically applies any new
+  // columns/tables added in newer better-auth releases (e.g. account.issuer).
+  await auth.runMigrations();
+
+  app.listen(PORT, () => {
+    console.log(`Studio Kanban backend running on http://localhost:${PORT}`);
+    console.log(`OpenAPI spec: http://localhost:${PORT}/api/openapi.json`);
+  });
+}
+
+startServer().catch((err) => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
 });

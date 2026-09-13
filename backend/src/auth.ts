@@ -17,6 +17,9 @@ export const auth = betterAuth({
   },
   trustedOrigins: [
     process.env.BETTER_AUTH_URL ?? 'http://localhost:5173',
+    'https://studiokanban.se',
+    'https://www.studiokanban.se',
+    'https://localhost:5173',
     'http://localhost:3001',
   ],
 });
