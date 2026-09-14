@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, notInArray } from 'drizzle-orm';
 import { db } from '../db/index';
 import { projects, projectSequences, projectMembers } from '../db/schema';
 import { scGet } from '../soundcloud/tokenManager';
@@ -148,7 +148,21 @@ soundcloudRouter.post('/projects/:id/soundcloud/sync', async (req, res) => {
       }
     }
 
-    res.json({ synced: results.length, tracks: results });
+    // Purge tracks that have been removed from the source playlist
+    let purged = 0;
+    if (playlist.tracks.length > 0) {
+      const incomingIds = playlist.tracks.map((t) => String(t.id));
+      const deleted = await db
+        .delete(projectSequences)
+        .where(and(
+          eq(projectSequences.projectId, req.params.id),
+          notInArray(projectSequences.scTrackId, incomingIds),
+        ))
+        .returning();
+      purged = deleted.length;
+    }
+
+    res.json({ synced: results.length, purged, tracks: results });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal server error' });
