@@ -212,19 +212,6 @@ export function SequencingView({ projectId }: SequencingViewProps) {
             <div className={styles.panelHeader}>
               <Term variant="label" className={styles.panelTitle}>Album sequence</Term>
               <Term variant="muted" className={styles.panelCount}>{approved.length} track{approved.length !== 1 ? 's' : ''}</Term>
-            </div>
-            <ApprovedZone tracks={approved} activeScTrackId={activeScTrackId} onPlay={playTrack} />
-          </section>
-
-          <div className={styles.divider} />
-
-          <section className={styles.panel}>
-            <div className={styles.panelHeader}>
-              <Term variant="label" className={styles.panelTitle}>Unapproved tracks</Term>
-              <Term variant="muted" className={styles.panelCount}>{unapproved.length} track{unapproved.length !== 1 ? 's' : ''}</Term>
-              <Button variant="ghost" size="sm" onClick={() => { setSyncedProjectId(null); syncPlaylist.mutate(); }}>
-                <Term>{syncPlaylist.isPending ? 'Syncing…' : 'Sync playlist'}</Term>
-              </Button>
               <button
                 className={[styles.commentBtn, isCommentOpen ? styles.commentBtnActive : ''].filter(Boolean).join(' ')}
                 onClick={() => openCommentDrawer({ type: 'sequence', projectId, title: 'Album sequence' })}
@@ -238,6 +225,19 @@ export function SequencingView({ projectId }: SequencingViewProps) {
                   <span className={styles.commentCount}>{sequenceCommentCount}</span>
                 )}
               </button>
+            </div>
+            <ApprovedZone tracks={approved} activeScTrackId={activeScTrackId} onPlay={playTrack} />
+          </section>
+
+          <div className={styles.divider} />
+
+          <section className={styles.panel}>
+            <div className={styles.panelHeader}>
+              <Term variant="label" className={styles.panelTitle}>Unapproved tracks</Term>
+              <Term variant="muted" className={styles.panelCount}>{unapproved.length} track{unapproved.length !== 1 ? 's' : ''}</Term>
+              <Button variant="ghost" size="sm" onClick={() => { setSyncedProjectId(null); syncPlaylist.mutate(); }}>
+                <Term>{syncPlaylist.isPending ? 'Syncing…' : 'Sync playlist'}</Term>
+              </Button>
             </div>
             <UnapprovedZone tracks={unapproved} activeScTrackId={activeScTrackId} onPlay={playTrack} />
           </section>
