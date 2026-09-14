@@ -61,67 +61,67 @@ export function BoardHeader({ projectId }: BoardHeaderProps) {
 				</div>
 			</div>
 			<div className={styles.actions}>
-				{inviteURL ? (
-					<div className={styles.inviteRow}>
-						<input
-							readOnly
-							value={inviteURL}
-							className={styles.inviteInput}
-							onFocus={(e) => e.target.select()}
-						/>
-						<Button variant="ghost" size="sm" onClick={handleCopy}>
-							<Term>{copied ? '✓ Copied' : 'Copy'}</Term>
-						</Button>
-						<Button variant="ghost" size="sm" onClick={() => setInviteURL(null)}>
-							<Term>×</Term>
-						</Button>
-					</div>
-				) : (
-					<Button variant="ghost" size="sm" onClick={handleInvite}>
-						<Term>Invite</Term>
-					</Button>
-				)}
-				<Button variant="ghost" size="sm" onClick={openSongManager}>
-					<Term>Manage Songs</Term>
-				</Button>
-				<Button variant="ghost" size="sm" onClick={openColumnManager}>
-					<Term>Manage Columns</Term>
-				</Button>
-				<Button
-					variant="ghost"
-					size="sm"
-					onClick={() => openEditProject(projectId)}
-				>
-					<Term>Edit Project</Term>
-				</Button>
-				{/* User info — rightmost, after a divider */}
+				{/* User info — top row */}
 				{session?.user && (
-					<>
-						<div className={styles.divider} />
-						<div className={styles.userInfo}>
-							{session.user.image ? (
-								<img src={session.user.image} alt={session.user.name ?? ''} className={styles.avatar} />
-							) : (
-								<div className={styles.avatarFallback}>
-									<Term>{(session.user.name ?? '?')[0].toUpperCase()}</Term>
-								</div>
-							)}
-							<Term className={styles.userName} variant="muted">{session.user.name}</Term>
-							<button
-								className={styles.signOutBtn}
-								onClick={() => authClient.signOut()}
-								aria-label="Sign out"
-								title="Sign out"
-							>
-								<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-									<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-									<polyline points="16 17 21 12 16 7"/>
-									<line x1="21" y1="12" x2="9" y2="12"/>
-								</svg>
-							</button>
-						</div>
-					</>
+					<div className={styles.userInfo}>
+						{session.user.image ? (
+							<img src={session.user.image} alt={session.user.name ?? ''} className={styles.avatar} />
+						) : (
+							<div className={styles.avatarFallback}>
+								<Term>{(session.user.name ?? '?')[0].toUpperCase()}</Term>
+							</div>
+						)}
+						<Term className={styles.userName} variant="muted">{session.user.name}</Term>
+						<button
+							className={styles.signOutBtn}
+							onClick={() => authClient.signOut()}
+							aria-label="Sign out"
+							title="Sign out"
+						>
+							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+								<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+								<polyline points="16 17 21 12 16 7"/>
+								<line x1="21" y1="12" x2="9" y2="12"/>
+							</svg>
+						</button>
+					</div>
 				)}
+				{/* Action buttons — bottom row */}
+				<div className={styles.actionButtons}>
+					{inviteURL ? (
+						<div className={styles.inviteRow}>
+							<input
+								readOnly
+								value={inviteURL}
+								className={styles.inviteInput}
+								onFocus={(e) => e.target.select()}
+							/>
+							<Button variant="ghost" size="sm" onClick={handleCopy}>
+								<Term>{copied ? '✓ Copied' : 'Copy'}</Term>
+							</Button>
+							<Button variant="ghost" size="sm" onClick={() => setInviteURL(null)}>
+								<Term>×</Term>
+							</Button>
+						</div>
+					) : (
+						<Button variant="ghost" size="sm" onClick={handleInvite}>
+							<Term>Invite</Term>
+						</Button>
+					)}
+					<Button variant="ghost" size="sm" onClick={openSongManager}>
+						<Term>Manage Songs</Term>
+					</Button>
+					<Button variant="ghost" size="sm" onClick={openColumnManager}>
+						<Term>Manage Columns</Term>
+					</Button>
+					<Button
+						variant="ghost"
+						size="sm"
+						onClick={() => openEditProject(projectId)}
+					>
+						<Term>Edit Project</Term>
+					</Button>
+				</div>
 			</div>
 		</header>
 	);
