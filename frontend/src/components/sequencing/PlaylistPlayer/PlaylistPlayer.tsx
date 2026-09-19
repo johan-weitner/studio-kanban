@@ -4,6 +4,7 @@ import styles from "./PlaylistPlayer.module.css";
 interface SCWidget {
 	bind: (event: string, callback: (data?: unknown) => void) => void;
 	skip: (index: number) => void;
+	pause: () => void;
 	play: () => void;
 	getSounds: (
 		callback: (sounds: Array<{ id: number | string }>) => void,
@@ -28,6 +29,8 @@ declare global {
 interface PlaylistPlayerProps {
 	playlistUrl: string;
 	secretToken: string | null;
+	/** scTrackIds in approved album-sequence order; governs auto-advance after FINISH */
+	approvedOrder: string[];
 	/** Called when the widget changes track (via its own controls) */
 	onTrackChange: (scTrackId: string) => void;
 	/** Imperative handle — parent sets this to trigger playTrack */
@@ -37,6 +40,7 @@ interface PlaylistPlayerProps {
 export function PlaylistPlayer({
 	playlistUrl,
 	secretToken,
+	approvedOrder,
 	onTrackChange,
 	onReady,
 }: PlaylistPlayerProps) {
@@ -44,6 +48,13 @@ export function PlaylistPlayer({
 	const widgetRef = useRef<SCWidget | null>(null);
 	const trackIndexMapRef = useRef<Map<string, number>>(new Map());
 	const readyRef = useRef(false);
+	// Keep a ref so the FINISH handler always sees the latest approved order
+	// without needing to re-bind the event listener on every drag.
+	const approvedOrderRef = useRef<string[]>(approvedOrder);
+	useEffect(() => { approvedOrderRef.current = approvedOrder; }, [approvedOrder]);
+	// Tracks the scTrackId of the currently-playing sound so the FINISH handler
+	// can act without an async getCurrentSound call (which can race the widget).
+	const currentTrackIdRef = useRef<string | null>(null);
 
 	// The SoundCloud Widget accepts `secret_token` as its own query param,
 	// separate from the encoded playlist URL.
@@ -99,8 +110,43 @@ export function PlaylistPlayer({
 
 			widget.bind(window.SC.Widget.Events.PLAY, () => {
 				widget.getCurrentSound((sound) => {
-					if (sound) onTrackChange(String(sound.id));
+					if (sound) {
+						const id = String(sound.id);
+						currentTrackIdRef.current = id;
+						onTrackChange(id);
+					}
 				});
+			});
+
+			// Intercept every FINISH to enforce our playback rules:
+			// • Approved track, not last → play next in album sequence order
+			// • Approved track, last   → stop (skip back to it without playing)
+			// • Unapproved track       → stop (skip back to it without playing)
+			// Using currentTrackIdRef avoids an async getCurrentSound call that
+			// could race the widget's own auto-advance.
+			widget.bind(window.SC.Widget.Events.FINISH, () => {
+				const currentId = currentTrackIdRef.current;
+				if (!currentId) return;
+				const order = approvedOrderRef.current;
+				const pos = order.indexOf(currentId);
+				if (pos !== -1 && pos < order.length - 1) {
+					// Next approved track
+					const nextId = order[pos + 1];
+					const nextIndex = trackIndexMapRef.current.get(nextId);
+					if (nextIndex !== undefined) {
+						widget.skip(nextIndex);
+						widget.play();
+					}
+				} else {
+					// Last approved track or unapproved — stop playback by
+					// skipping back to the finished track without calling play().
+					const idx = trackIndexMapRef.current.get(currentId);
+					if (idx !== undefined) {
+						widget.pause();
+						widget.skip(idx);
+						widget.pause();
+					}
+				}
 			});
 		};
 
