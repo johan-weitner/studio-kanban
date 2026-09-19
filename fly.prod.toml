@@ -6,7 +6,6 @@ primary_region = 'arn'
 
 [build]
 [env]
-  DATABASE_URL = '/data/studio-kanban.db'
   NODE_ENV = 'production'
   PORT = '8080'
 

@@ -202,6 +202,7 @@ export function SequencingView({ projectId }: SequencingViewProps) {
           <PlaylistPlayer
             playlistUrl={data.playlistUrl}
             secretToken={data.secretToken}
+            approvedOrder={approved.map((t) => t.scTrackId)}
             onTrackChange={setActiveScTrackId}
             onReady={(fn) => { playTrackRef.current = fn }}
           />
