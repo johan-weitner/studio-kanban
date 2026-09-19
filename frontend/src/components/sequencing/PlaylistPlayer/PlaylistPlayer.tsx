@@ -4,6 +4,7 @@ import styles from "./PlaylistPlayer.module.css";
 interface SCWidget {
 	bind: (event: string, callback: (data?: unknown) => void) => void;
 	skip: (index: number) => void;
+	pause: () => void;
 	play: () => void;
 	getSounds: (
 		callback: (sounds: Array<{ id: number | string }>) => void,
@@ -140,7 +141,11 @@ export function PlaylistPlayer({
 					// Last approved track or unapproved — stop playback by
 					// skipping back to the finished track without calling play().
 					const idx = trackIndexMapRef.current.get(currentId);
-					if (idx !== undefined) widget.skip(idx);
+					if (idx !== undefined) {
+						widget.pause();
+						widget.skip(idx);
+						widget.pause();
+					}
 				}
 			});
 		};
