@@ -39,18 +39,17 @@
   transform: rotate(-90deg);
 }
 
-.titleGroup {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-2);
-  flex: 1;
-  min-width: 0;
-}
-
 .songTitle {
   font-size: var(--text-sm);
   font-weight: var(--fw-semibold);
   color: var(--text-primary);
+  flex-shrink: 0;
+}
+
+.spacer {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .songDesc {
@@ -58,6 +57,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: block;
 }
 
 .taskCount {
@@ -69,21 +69,24 @@
   align-items: center;
   justify-content: center;
   gap: 3px;
-  height: 22px;
-  padding: 0 4px;
-  border-radius: var(--radius-sm);
-  color: var(--text-muted);
+  height: 28px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  background: transparent;
   flex-shrink: 0;
-  transition: color 0.15s ease, background 0.15s ease;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
 }
 
 .commentBtn:hover {
   color: var(--text-primary);
-  background: var(--bg-card);
+  background: var(--bg-card-hover);
 }
 
 .commentBtnActive {
   color: var(--accent);
+  border-color: var(--accent);
 }
 
 .commentCount {
