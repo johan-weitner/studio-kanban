@@ -32,15 +32,7 @@ export function Swimlane({ song, columns, tasks, collapsed, onToggleCollapse }: 
             ▾
           </span>
         </button>
-        <div className={styles.titleGroup}>
-          <Term className={styles.songTitle}>{song.title}</Term>
-          {song.description && (
-            <Term variant="muted" className={styles.songDesc}>{song.description}</Term>
-          )}
-        </div>
-        <span className={styles.taskCount}>
-          <Term variant="muted">{tasks.length} task{tasks.length !== 1 ? 's' : ''}</Term>
-        </span>
+        <Term className={styles.songTitle}>{song.title}</Term>
         <button
           className={[styles.commentBtn, isCommentOpen ? styles.commentBtnActive : ''].filter(Boolean).join(' ')}
           onClick={() => openCommentDrawer({ type: 'song', id: song.id, title: song.title })}
@@ -54,6 +46,14 @@ export function Swimlane({ song, columns, tasks, collapsed, onToggleCollapse }: 
             <span className={styles.commentCount}>{commentCount}</span>
           )}
         </button>
+        <div className={styles.spacer}>
+          {song.description && (
+            <Term variant="muted" className={styles.songDesc}>{song.description}</Term>
+          )}
+        </div>
+        <span className={styles.taskCount}>
+          <Term variant="muted">{tasks.length} task{tasks.length !== 1 ? 's' : ''}</Term>
+        </span>
       </div>
 
       {/* Task cells per column — hidden when collapsed */}
