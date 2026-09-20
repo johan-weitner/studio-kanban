@@ -6,6 +6,7 @@ import { useSongs } from '../../../hooks/useSongs'
 import { useTasks, useMoveTask } from '../../../hooks/useTasks'
 import { Swimlane } from '../Swimlane/Swimlane'
 import { Term } from '../../ui/Term/Term'
+import { Button } from '../../ui/Button/Button'
 import type { Column, Song, Task } from '../../../api/types'
 import styles from './Board.module.css'
 
@@ -52,6 +53,16 @@ export function Board({ projectId }: BoardProps) {
       else next.add(id)
       return next
     })
+  }
+
+  const allCollapsed = !!songs?.length && songs.every((s) => collapsedSongs.has(s.id))
+
+  const toggleAllSongs = () => {
+    if (allCollapsed) {
+      setCollapsedSongs(new Set())
+    } else {
+      setCollapsedSongs(new Set(songs?.map((s) => s.id) ?? []))
+    }
   }
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -111,6 +122,13 @@ export function Board({ projectId }: BoardProps) {
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      {songs && songs.length > 0 && (
+        <div className={styles.toolbar}>
+          <Button variant="ghost" size="sm" onClick={toggleAllSongs}>
+            <Term>{allCollapsed ? 'Expand all' : 'Collapse all'}</Term>
+          </Button>
+        </div>
+      )}
       <div className={styles.boardWrapper}>
         <div className={styles.board} style={{ gridTemplateColumns }}>
           {/* Column headers row */}
