@@ -1,5 +1,6 @@
 import { usePlayerStore } from '../../../stores/usePlayerStore'
 import { useSequence } from '../../../hooks/useSequence'
+import { Term } from '../../ui/Term/Term'
 import styles from './BoardMiniPlayer.module.css'
 
 interface BoardMiniPlayerProps {
@@ -16,27 +17,9 @@ export function BoardMiniPlayer({ projectId }: BoardMiniPlayerProps) {
 
   if (!activeScTrackId || !playerControls) return null
 
-  // Find the active track in sequence data to get its permalink URL for the iframe
+  // Find the active track to display its title
   const allTracks = [...(sequenceData?.approved ?? []), ...(sequenceData?.unapproved ?? [])]
   const activeTrack = allTracks.find((t) => t.scTrackId === activeScTrackId)
-  const secretToken = sequenceData?.secretToken
-
-  // Build the mini-player iframe src — single-track embed, auto_play=false (visual only)
-  const iframeSrc = activeTrack
-    ? [
-        'https://w.soundcloud.com/player/',
-        `?url=${encodeURIComponent(activeTrack.permalinkUrl)}`,
-        secretToken ? `&secret_token=${encodeURIComponent(secretToken)}` : '',
-        '&color=%23dd7b77',
-        '&auto_play=false',
-        '&show_user=false',
-        '&hide_related=true',
-        '&show_comments=false',
-        '&show_reposts=false',
-        '&show_teaser=false',
-        '&inverse=false',
-      ].join('')
-    : null
 
   const seekBack = () => playerControls.getPosition((pos) => playerControls.seekTo(Math.max(0, pos - 15000)))
   const seekForward = () => playerControls.getPosition((pos) => playerControls.seekTo(pos + 15000))
@@ -44,20 +27,14 @@ export function BoardMiniPlayer({ projectId }: BoardMiniPlayerProps) {
 
   return (
     <div className={styles.miniPlayer}>
-      {iframeSrc && (
-        <div className={styles.iframeWrap}>
-          <iframe
-            key={activeScTrackId}
-            width="100%"
-            height="20"
-            scrolling="no"
-            frameBorder="no"
-            allow="autoplay; encrypted-media"
-            src={iframeSrc}
-            title="Now playing"
-          />
-        </div>
-      )}
+      <div className={styles.trackInfo}>
+        {isPlaying ? (
+          <span className={styles.playingDot} aria-hidden="true" />
+        ) : null}
+        <Term variant="muted" className={styles.trackTitle}>
+          {activeTrack?.title ?? 'Now playing'}
+        </Term>
+      </div>
       <div className={styles.controls}>
         <button
           className={styles.controlBtn}

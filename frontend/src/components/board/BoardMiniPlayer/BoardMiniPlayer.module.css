@@ -1,24 +1,39 @@
 .miniPlayer {
   display: flex;
   align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  flex: 1;
+}
+
+.trackInfo {
+  display: flex;
+  align-items: center;
   gap: var(--space-2);
   min-width: 0;
   flex: 1;
-}
-
-.iframeWrap {
-  flex: 1;
-  min-width: 0;
   overflow: hidden;
-  border-radius: var(--radius-sm);
-  /* Clip the SC iframe to just its narrow strip */
-  height: 20px;
 }
 
-.iframeWrap iframe {
-  display: block;
-  /* SC iframe always renders taller than we want; clip it */
-  margin-top: -1px;
+.playingDot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  flex-shrink: 0;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
+.trackTitle {
+  font-size: var(--text-xs);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .controls {
