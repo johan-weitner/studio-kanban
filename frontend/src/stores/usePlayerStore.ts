@@ -22,9 +22,11 @@ interface PlayerStore {
   setActiveTrack: (id: string | null) => void
   setIsPlaying: (playing: boolean) => void
   toggleRepeat: () => void
+  setRepeatEnabled: (enabled: boolean) => void
   registerPlayerControls: (controls: PlayerControls) => void
   unregisterPlayerControls: () => void
   registerPlayTrack: (fn: (scTrackId: string) => void) => void
+  unregisterPlayTrack: () => void
 }
 
 export const usePlayerStore = create<PlayerStore>((set) => ({
@@ -37,7 +39,9 @@ export const usePlayerStore = create<PlayerStore>((set) => ({
   setActiveTrack: (id) => set({ activeScTrackId: id }),
   setIsPlaying: (playing) => set({ isPlaying: playing }),
   toggleRepeat: () => set((s) => ({ repeatEnabled: !s.repeatEnabled })),
+  setRepeatEnabled: (enabled) => set({ repeatEnabled: enabled }),
   registerPlayerControls: (controls) => set({ playerControls: controls }),
   unregisterPlayerControls: () => set({ playerControls: null }),
   registerPlayTrack: (fn) => set({ playTrack: fn }),
+  unregisterPlayTrack: () => set({ playTrack: null }),
 }))

@@ -67,13 +67,17 @@ export function Board({ projectId }: BoardProps) {
   const activeView = useUIStore((s) => s.activeView)
   const activeScTrackId = usePlayerStore((s) => s.activeScTrackId)
   const playerControls = usePlayerStore((s) => s.playerControls)
+  const setRepeatEnabled = usePlayerStore((s) => s.setRepeatEnabled)
 
   const approvedTracks = sequenceData?.approved ?? []
+  // Include unapproved so a playing unapproved track still focuses its swimlane
+  const allSequenceTracks = [...approvedTracks, ...(sequenceData?.unapproved ?? [])]
 
-  // Auto-expand the song matching the currently-playing track when switching to board view
+  // Auto-expand the song matching the currently-playing track when switching to board view;
+  // also enable repeat so the track loops while the user works in the board.
   useEffect(() => {
     if (activeView !== 'board' || !activeScTrackId || !songs?.length) return
-    const activeTrack = approvedTracks.find((t) => t.scTrackId === activeScTrackId)
+    const activeTrack = allSequenceTracks.find((t) => t.scTrackId === activeScTrackId)
     if (!activeTrack) return
     const matchingSong = songs.find(
       (s) => normalise(s.title) === normalise(activeTrack.title) ||
@@ -82,6 +86,8 @@ export function Board({ projectId }: BoardProps) {
     )
     if (!matchingSong) return
     setCollapsedSongs(new Set(songs.filter((s) => s.id !== matchingSong.id).map((s) => s.id)))
+    // Enable repeat for the focused song; user can turn it off with the repeat button.
+    setRepeatEnabled(true)
   }, [activeView, activeScTrackId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Arrow-key seek — only while in board view and playback controls are available
@@ -207,7 +213,7 @@ export function Board({ projectId }: BoardProps) {
               columns={columns}
               collapsed={collapsedSongs.has(song.id)}
               onToggleCollapse={() => toggleSong(song.id)}
-              sequenceTracks={approvedTracks}
+          sequenceTracks={allSequenceTracks}
               activeScTrackId={activeScTrackId}
             />
           ))}

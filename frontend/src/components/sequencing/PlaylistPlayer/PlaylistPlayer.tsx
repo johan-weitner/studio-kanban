@@ -17,11 +17,12 @@ declare global {
 	interface Window {
 		SC?: {
 			Widget: ((iframe: HTMLIFrameElement) => SCWidget) & {
-				Events: {
-					READY: string
-					PLAY: string
-					FINISH: string
-				}
+					Events: {
+						READY: string
+						PLAY: string
+						PAUSE: string
+						FINISH: string
+					}
 			}
 		}
 	}
@@ -60,7 +61,14 @@ export function PlaylistPlayer({
 		usePlayerStore.subscribe((s) => { repeatEnabledRef.current = s.repeatEnabled }),
 	[])
 
-	const { registerPlayerControls, registerPlayTrack, setActiveTrack, setIsPlaying } = usePlayerStore.getState()
+	const {
+		registerPlayerControls,
+		unregisterPlayerControls,
+		registerPlayTrack,
+		unregisterPlayTrack,
+		setActiveTrack,
+		setIsPlaying,
+	} = usePlayerStore.getState()
 
 	const src = [
 		'https://w.soundcloud.com/player/',
@@ -130,6 +138,11 @@ export function PlaylistPlayer({
 				})
 			})
 
+			// Keep isPlaying accurate when the user pauses via the SC widget controls
+			widget.bind(window.SC.Widget.Events.PAUSE, () => {
+				setIsPlaying(false)
+			})
+
 			// Intercept every FINISH to enforce playback rules:
 			// • Repeat on              → replay current track
 			// • Approved, not last    → play next in album sequence order
@@ -160,7 +173,12 @@ export function PlaylistPlayer({
 				} else {
 					widget.pause()
 					const idx = trackIndexMapRef.current.get(currentId)
-					if (idx !== undefined) widget.skip(idx)
+					if (idx !== undefined) {
+						widget.skip(idx)
+						// Second pause prevents skip() from triggering a PLAY event
+						// that would overwrite setIsPlaying(false).
+						widget.pause()
+					}
 					setIsPlaying(false)
 				}
 			})
@@ -173,7 +191,15 @@ export function PlaylistPlayer({
 			}
 		}, 100)
 
-		return () => clearInterval(checkReady)
+		return () => {
+			clearInterval(checkReady)
+			// Clear store references so the Board mini-player can't command
+			// a stale/unmounted widget after a project switch.
+			unregisterPlayerControls()
+			unregisterPlayTrack()
+			setActiveTrack(null)
+			setIsPlaying(false)
+		}
 	}, []) // eslint-disable-line react-hooks/exhaustive-deps
 
 	return (
