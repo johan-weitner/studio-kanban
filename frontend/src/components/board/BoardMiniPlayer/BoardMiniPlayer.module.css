@@ -1,0 +1,54 @@
+.miniPlayer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  flex: 1;
+}
+
+.iframeWrap {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  /* Clip the SC iframe to just its narrow strip */
+  height: 20px;
+}
+
+.iframeWrap iframe {
+  display: block;
+  /* SC iframe always renders taller than we want; clip it */
+  margin-top: -1px;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.controlBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  background: transparent;
+  flex-shrink: 0;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  font-size: var(--text-xs);
+}
+
+.controlBtn:hover {
+  color: var(--text-primary);
+  background: var(--bg-card-hover);
+}
+
+.controlBtnActive {
+  color: var(--accent);
+  border-color: var(--accent);
+}
