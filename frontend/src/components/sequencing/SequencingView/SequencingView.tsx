@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import {
   DndContext,
   DragOverlay,
@@ -27,6 +27,7 @@ import { PlaylistSetup } from '../PlaylistSetup/PlaylistSetup'
 import { Term } from '../../ui/Term/Term'
 import { Button } from '../../ui/Button/Button'
 import { useUIStore } from '../../../stores/useUIStore'
+import { usePlayerStore } from '../../../stores/usePlayerStore'
 import { useCommentCounts } from '../../../hooks/useComments'
 import styles from './SequencingView.module.css'
 
@@ -113,10 +114,11 @@ export function SequencingView({ projectId }: SequencingViewProps) {
   const [approved, setApproved] = useState<SequenceTrack[]>([])
   const [unapproved, setUnapproved] = useState<SequenceTrack[]>([])
   const [activeTrack, setActiveTrack] = useState<SequenceTrack | null>(null)
-  const [activeScTrackId, setActiveScTrackId] = useState<string | null>(null)
   // Track which projectId was last synced so we re-apply when the project switches.
   const [syncedProjectId, setSyncedProjectId] = useState<string | null>(null)
-  const playTrackRef = useRef<(scTrackId: string) => void>(() => {})
+  // Playback state comes from the shared player store so Board view can also read it.
+  const activeScTrackId = usePlayerStore((s) => s.activeScTrackId)
+  const storePlayTrack = usePlayerStore((s) => s.playTrack)
 
   if (data && syncedProjectId !== projectId) {
     setApproved(data.approved)
@@ -127,8 +129,7 @@ export function SequencingView({ projectId }: SequencingViewProps) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
   const playTrack = (scTrackId: string) => {
-    setActiveScTrackId(scTrackId)
-    playTrackRef.current(scTrackId)
+    storePlayTrack?.(scTrackId)
   }
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -203,8 +204,8 @@ export function SequencingView({ projectId }: SequencingViewProps) {
             playlistUrl={data.playlistUrl}
             secretToken={data.secretToken}
             approvedOrder={approved.map((t) => t.scTrackId)}
-            onTrackChange={setActiveScTrackId}
-            onReady={(fn) => { playTrackRef.current = fn }}
+            onTrackChange={() => { /* state lives in usePlayerStore */ }}
+            onReady={() => { /* playTrack registered directly in usePlayerStore */ }}
           />
         )}
 

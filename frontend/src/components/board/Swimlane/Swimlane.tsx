@@ -1,8 +1,11 @@
 import type { Column, Song, Task } from '../../../api/types'
+import type { SequenceTrack } from '../../../hooks/useSequence'
 import { Term } from '../../ui/Term/Term'
 import { SwimlaneCell } from '../SwimlaneCell/SwimlaneCell'
 import { useUIStore } from '../../../stores/useUIStore'
+import { usePlayerStore } from '../../../stores/usePlayerStore'
 import { useCommentCounts } from '../../../hooks/useComments'
+import { findTrackForSong } from '../Board/Board'
 import styles from './Swimlane.module.css'
 
 interface SwimlaneProps {
@@ -11,14 +14,19 @@ interface SwimlaneProps {
   tasks: Task[]
   collapsed: boolean
   onToggleCollapse: () => void
+  sequenceTracks: SequenceTrack[]
+  activeScTrackId: string | null
 }
 
-export function Swimlane({ song, columns, tasks, collapsed, onToggleCollapse }: SwimlaneProps) {
+export function Swimlane({ song, columns, tasks, collapsed, onToggleCollapse, sequenceTracks, activeScTrackId }: SwimlaneProps) {
   const openCommentDrawer = useUIStore((s) => s.openCommentDrawer)
   const commentTarget = useUIStore((s) => s.commentTarget)
   const isCommentOpen = commentTarget?.type === 'song' && commentTarget.id === song.id
   const { data: counts } = useCommentCounts(song.projectId)
   const commentCount = counts?.bySong[song.id] ?? 0
+  const storePlayTrack = usePlayerStore((s) => s.playTrack)
+  const songTrackId = findTrackForSong(song, sequenceTracks)
+  const isTrackPlaying = songTrackId !== null && activeScTrackId === songTrackId
   return (
     <>
       {/* Swimlane header — spans all columns */}
@@ -33,6 +41,18 @@ export function Swimlane({ song, columns, tasks, collapsed, onToggleCollapse }: 
           </span>
         </button>
         <Term className={styles.songTitle}>{song.title}</Term>
+        {songTrackId && (
+          <button
+            className={[styles.commentBtn, isTrackPlaying ? styles.commentBtnActive : ''].filter(Boolean).join(' ')}
+            onClick={() => storePlayTrack?.(songTrackId)}
+            aria-label={isTrackPlaying ? 'Now playing' : 'Play'}
+            title={isTrackPlaying ? 'Now playing' : 'Play track'}
+          >
+            <svg width="11" height="13" viewBox="0 0 11 13" fill="currentColor" aria-hidden="true">
+              <path d="M0 0L11 6.5L0 13V0Z"/>
+            </svg>
+          </button>
+        )}
         <button
           className={[styles.commentBtn, isCommentOpen ? styles.commentBtnActive : ''].filter(Boolean).join(' ')}
           onClick={() => openCommentDrawer({ type: 'song', id: song.id, title: song.title })}
