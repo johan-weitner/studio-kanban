@@ -6,6 +6,11 @@ A Kanban board for music production. Organize albums, songs, and production task
 
 **Production** (multi-user with authentication): [https://studiokanban.se/](https://studiokanban.se/)
 
+## Deployment modes
+
+- `fly.toml` deploys the public, single-user demo from `main`. It enables `DEMO_MODE` and builds the frontend with `VITE_APP_MODE=demo`; the demo is intentionally publicly writable.
+- `fly.stage.toml` and `fly.prod.toml` deploy authenticated staging and production environments. They do not set either demo-mode variable.
+
 ## Screenshots
 ### Board view
 ![Studio Kanban Screenshot](./assets/studio-kanban-screen-1.png)

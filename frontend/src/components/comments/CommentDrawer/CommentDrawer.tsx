@@ -10,6 +10,7 @@ import {
 } from '../../../hooks/useComments'
 import type { Comment } from '../../../hooks/useComments'
 import { Term } from '../../ui/Term/Term'
+import { demoUserId, isDemoMode } from '../../../config/runtime'
 import styles from './CommentDrawer.module.css'
 
 // ── Formatting helpers ────────────────────────────────────────────────────
@@ -99,9 +100,26 @@ export function CommentDrawer() {
 // Inner component — target is guaranteed non-null here so hooks are always
 // called with a valid value.
 function CommentDrawerInner({ target }: { target: CommentTarget }) {
-  const close = useUIStore((s) => s.closeCommentDrawer)
+  return isDemoMode ? (
+    <CommentDrawerContent target={target} currentUserId={demoUserId} />
+  ) : (
+    <AuthenticatedCommentDrawerInner target={target} />
+  )
+}
+
+function AuthenticatedCommentDrawerInner({ target }: { target: CommentTarget }) {
   const { data: session } = authClient.useSession()
-  const currentUserId = session?.user?.id
+  return <CommentDrawerContent target={target} currentUserId={session?.user?.id} />
+}
+
+function CommentDrawerContent({
+  target,
+  currentUserId,
+}: {
+  target: CommentTarget
+  currentUserId: string | undefined
+}) {
+  const close = useUIStore((s) => s.closeCommentDrawer)
 
   const { data: thread } = useComments(target)
   const createComment = useCreateComment(target)
