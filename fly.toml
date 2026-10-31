@@ -1,12 +1,15 @@
-# Demo instance — single-user, no auth (deployed from single-user-demo branch)
+# Demo instance — single-user, no auth (deployed from main)
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 
 app = 'studio-kanban'
 primary_region = 'arn'
 
 [build]
+  [build.args]
+    VITE_APP_MODE = 'demo'
 [env]
   DATABASE_URL = '/data/studio-kanban.db'
+  DEMO_MODE = 'true'
   NODE_ENV = 'production'
   PORT = '8080'
 
@@ -30,6 +33,6 @@ primary_region = 'arn'
   headers = { X-Forwarded-Proto = 'https' }
 
 [[vm]]
-  memory = '1gb'
+  memory = '512mb'
   cpus = 1
-  memory_mb = 1024
+  memory_mb = 512

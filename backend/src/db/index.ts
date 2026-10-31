@@ -1,23 +1,28 @@
-import Database from 'better-sqlite3';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import { mkdirSync } from 'fs';
-import { dirname, resolve } from 'path';
-import * as schema from './schema';
+import { mkdirSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import Database from "better-sqlite3";
+import { drizzle } from "drizzle-orm/better-sqlite3";
+import * as schema from "./schema";
 
-const dbPath = resolve(process.env.DATABASE_URL ?? './data/studio-kanban.db');
+const dbPath = resolve(process.env.DATABASE_URL ?? "./data/studio-kanban.db");
 mkdirSync(dirname(dbPath), { recursive: true });
 
 const sqlite = new Database(dbPath);
-sqlite.pragma('journal_mode = WAL');
-sqlite.pragma('foreign_keys = ON');
+sqlite.pragma("journal_mode = WAL");
+sqlite.pragma("foreign_keys = ON");
 
 export const db = drizzle(sqlite, { schema });
 
 /** Shared raw connection — Better Auth uses this same instance */
 export { sqlite };
+export function backfillProjectOwners(ownerId: string): void {
+	sqlite
+		.prepare("UPDATE projects SET owner_id = ? WHERE owner_id IS NULL")
+		.run(ownerId);
+}
 
 export function initDb(): void {
-  sqlite.exec(`
+	sqlite.exec(`
     CREATE TABLE IF NOT EXISTS projects (
       id TEXT PRIMARY KEY,
       owner_id TEXT,
@@ -64,7 +69,7 @@ export function initDb(): void {
     );
   `);
 
-  sqlite.exec(`
+	sqlite.exec(`
     CREATE TABLE IF NOT EXISTS project_members (
       id TEXT PRIMARY KEY,
       project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
@@ -82,10 +87,10 @@ export function initDb(): void {
     );
   `);
 
-  // Better Auth tables are managed by auth.runMigrations() in index.ts
+	// Better Auth tables are managed by auth.runMigrations() in index.ts
 
-  // New tables for SoundCloud sequencing
-  sqlite.exec(`
+	// New tables for SoundCloud sequencing
+	sqlite.exec(`
     CREATE TABLE IF NOT EXISTS project_sequences (
       id TEXT PRIMARY KEY,
       project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
@@ -105,7 +110,7 @@ export function initDb(): void {
     );
   `);
 
-  sqlite.exec(`
+	sqlite.exec(`
     CREATE TABLE IF NOT EXISTS comments (
       id TEXT PRIMARY KEY,
       project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
@@ -122,15 +127,19 @@ export function initDb(): void {
     CREATE INDEX IF NOT EXISTS comments_parent_id_idx ON comments(parent_id);
   `);
 
-  // Migrate existing DBs: add columns added after initial schema
-  // Note: better-auth table migrations (e.g. account.issuer) are handled by
-  // auth.runMigrations() in index.ts — no need to list them here.
-  const migrations = [
-    'ALTER TABLE projects ADD COLUMN owner_id TEXT;',
-    'ALTER TABLE projects ADD COLUMN soundcloud_playlist_url TEXT;',
-    'ALTER TABLE projects ADD COLUMN soundcloud_secret_token TEXT;',
-  ];
-  for (const sql of migrations) {
-    try { sqlite.exec(sql); } catch { /* column already exists */ }
-  }
+	// Migrate existing DBs: add columns added after initial schema
+	// Note: better-auth table migrations (e.g. account.issuer) are handled by
+	// auth.runMigrations() in index.ts — no need to list them here.
+	const migrations = [
+		"ALTER TABLE projects ADD COLUMN owner_id TEXT;",
+		"ALTER TABLE projects ADD COLUMN soundcloud_playlist_url TEXT;",
+		"ALTER TABLE projects ADD COLUMN soundcloud_secret_token TEXT;",
+	];
+	for (const sql of migrations) {
+		try {
+			sqlite.exec(sql);
+		} catch {
+			/* column already exists */
+		}
+	}
 }
