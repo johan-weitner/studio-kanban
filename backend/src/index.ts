@@ -6,7 +6,7 @@ import path from 'path';
 import { toNodeHandler } from 'better-auth/node';
 import { getMigrations } from 'better-auth/db/migration';
 import { auth, authOptions } from './auth';
-import { initDb } from './db/index';
+import { initDb, sqlite } from './db/index';
 import { router } from './routes/index';
 import { openapiRouter } from './openapi';
 
@@ -35,6 +35,14 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json({ limit: '100kb' }));
+app.get('/api/health', (_req, res) => {
+  try {
+    sqlite.prepare('SELECT 1').get();
+    return res.status(200).json({ status: 'ok' });
+  } catch {
+    return res.status(503).json({ status: 'unavailable' });
+  }
+});
 
 // Auth handler — must be mounted BEFORE the API router
 app.all('/api/auth/*', toNodeHandler(auth));
